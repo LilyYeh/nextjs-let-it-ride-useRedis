@@ -115,7 +115,8 @@ export default function Home() {
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
-		const res = await response.json();
+		let res = await response.json();
+		console.log(res)
 		if(!res) {
 			displayBlock('waiting');
 		}else{
