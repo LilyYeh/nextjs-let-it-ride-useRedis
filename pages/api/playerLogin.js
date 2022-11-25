@@ -6,14 +6,18 @@ export default async function handler(req, res) {
 	try {
 
 		const socketId = JSON.parse(req.body).socketId;
-
-		let totalPlayers = await countPlayers();
-		let isCurrentPlayer = 0;
-		if(totalPlayers === 0) {
-			isCurrentPlayer = 1;
-		}
-
 		let cookieId = await getCookie('cookieId', { req, res });
+
+		//let totalPlayers = await countPlayers();
+		const players = await getAllPlayers();
+		const totalPlayers = players.length;
+		let isCurrentPlayer = 1;
+		for(let i=0; i < totalPlayers; i++){
+			// 輪到自己？
+			if(players[i].isCurrentPlayer){
+				isCurrentPlayer = 0;
+			}
+		}
 
 		// check login
 		let player;
@@ -42,7 +46,7 @@ export default async function handler(req, res) {
 				return;
 			}else{
 				// update redis
-				await updatePlayer({socketId:socketId, cookieId:cookieId, islogin:true});
+				await updatePlayer({socketId:socketId, cookieId:cookieId, isCurrentPlayer:isCurrentPlayer, islogin:true});
 				const players = await getAllPlayers();
 				res.status(200).json(players);
 			}

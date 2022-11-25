@@ -1,5 +1,5 @@
 import {countCards, createCards, getCards} from "../../lib/redis_cards";
-import {getAllPlayers, updatePlayer} from "../../lib/redis_player";
+import {updatePlayer} from "../../lib/redis_player";
 import { getCookie } from 'cookies-next';
 
 /*

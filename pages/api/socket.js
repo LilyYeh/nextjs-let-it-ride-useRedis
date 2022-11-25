@@ -1,6 +1,5 @@
 import { Server } from 'socket.io';
-import {getAllPlayers, removePlayers, setNextPlayer} from "../../lib/redis_player";
-import {foldCards} from "../../lib/redis_cards";
+import {removePlayers} from "../../lib/redis_player";
 
 export default function handler(req, res) {
 	// It means that socket server was already initialised
