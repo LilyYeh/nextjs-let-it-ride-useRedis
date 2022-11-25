@@ -24,7 +24,7 @@ export default function Home() {
 	const [ my3edCards, set3edCard ] = useState({});
 
 	const baseMoney = 10;
-	const baseMyMoney = 30;
+	const baseMyMoney = 1000;
 	const [ inputBets, setInputBets ] = useState(0);
 	const [ buttonBets, setButtonBets ] = useState(0);
 	const [ bets, setBets ] = useState(0);
