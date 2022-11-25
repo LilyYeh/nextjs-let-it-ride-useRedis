@@ -1,9 +1,8 @@
-import { getPlayers, setNextPlayer } from "../../lib/db_players";
-import { setTotalMoney } from "../../lib/db_banker";
+import { getAllPlayers, setNextPlayer } from "../../lib/redis_player";
 
 export default async function handler(req, res) {
 	try {
-		const players = await getPlayers();
+		const players = await getAllPlayers();
 		players.sort((a, b) => {
 			if(a.money > b.money){
 				return -1;
@@ -11,9 +10,6 @@ export default async function handler(req, res) {
 				return 1;
 			}
 		})
-
-		const totalMoney = JSON.parse(req.body).totalMoney;
-		await setTotalMoney(totalMoney);
 
 		await setNextPlayer();
 

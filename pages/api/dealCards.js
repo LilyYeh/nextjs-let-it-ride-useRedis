@@ -1,5 +1,6 @@
-import { foldCards, countCards, getCards, shuffle } from "../../lib/db_cards";
-import {getPlayers, setKeepGoing} from "../../lib/db_players";
+import {countCards, createCards, getCards} from "../../lib/redis_cards";
+import {getAllPlayers, updatePlayer} from "../../lib/redis_player";
+import { getCookie } from 'cookies-next';
 
 /*
  * return 一副撲克牌
@@ -7,25 +8,24 @@ import {getPlayers, setKeepGoing} from "../../lib/db_players";
  */
 export default async function handler(req, res) {
 	try {
-		const socketId = JSON.parse(req.body).socketId;
-
-		// 棄牌
-		//await foldCards(socketId);
+		const cookieId = await getCookie('cookieId', { req, res });
 
 		// 牌庫是否有牌？
-		var totalCards = await countCards();
+		const totalCards = await countCards();
 
 		// fail 重新洗牌
 		if(totalCards < 2){
-			await shuffle();
+			// create cards 建立牌庫(52張)
+			await createCards();
 		}
 
 		// ok 拿取手牌
-		const cards = await getCards(socketId,2);
+		const cards = await getCards(cookieId,2);
 
 		const baseMoney = JSON.parse(req.body).baseMoney;
 		const baseMyMoney = JSON.parse(req.body).baseMyMoney;
 		let players = JSON.parse(req.body).players;
+
 		// 計算檯面金額
 		let baseAllMoney = players.length * baseMyMoney;
 		let totalPlayersMoney = 0;
@@ -34,8 +34,13 @@ export default async function handler(req, res) {
 		});
 		// 檯面沒錢了
 		if(baseAllMoney - totalPlayersMoney <= 0){
-			await setKeepGoing(baseMoney);
-			players = await getPlayers();
+			players.forEach((player,index)=> {
+				players[index].money = player.money - baseMoney;
+				updatePlayer({
+					cookieId: player.cookieId,
+					baseMoney: baseMoney
+				});
+			});
 		}
 
 		//api 一定要放 res.status(200).json(myCards); 才能印出資料

@@ -6,20 +6,20 @@ const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 
 export default function playerMoney({playerData, currentPlayer, baseMyMoney, getCardFlag}) {
 	const [ money, setMoney ]=useState(playerData.money);
-	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId%6]]);
+	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
 
 
 	useEffect(() => {
 		if(getCardFlag){
 			if (playerData.money > money) {
-				setStyle(styles[players_img[playerData.playerId % 6] + '-win']);
+				setStyle(styles[players_img[playerData.playerId] + '-win']);
 			} else if (playerData.money < money) {
-				setStyle(styles[players_img[playerData.playerId % 6] + '-lose']);
+				setStyle(styles[players_img[playerData.playerId] + '-lose']);
 			} else {
-				setStyle(styles[players_img[playerData.playerId % 6]]);
+				setStyle(styles[players_img[playerData.playerId]]);
 			}
 		}else{
-			setStyle(styles[players_img[playerData.playerId % 6]]);
+			setStyle(styles[players_img[playerData.playerId]]);
 		}
 
 		setMoney(playerData.money);

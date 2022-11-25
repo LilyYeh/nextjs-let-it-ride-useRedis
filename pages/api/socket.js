@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
-import { logout, getPlayers } from "../../lib/db_players";
+import {getAllPlayers, removePlayers, setNextPlayer} from "../../lib/redis_player";
+import {foldCards} from "../../lib/redis_cards";
 
 export default function handler(req, res) {
 	// It means that socket server was already initialised
@@ -17,9 +18,8 @@ export default function handler(req, res) {
 		socket.on('disconnect', () => {
 			console.log(`${socket.id} disconnect !`);
 			async function disconn(){
-				await logout(socket.id);
-				playersData = await getPlayers();
-				socket.broadcast.emit('update-players', playersData);
+				playersData = await removePlayers(socket.id);
+				socket.broadcast.emit('set-next-player', playersData);
 			}
 			disconn();
 		});

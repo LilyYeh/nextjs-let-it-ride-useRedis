@@ -24,7 +24,7 @@ export default function Home() {
 	const [ my3edCards, set3edCard ] = useState({});
 
 	const baseMoney = 10;
-	const baseMyMoney = 1000;
+	const baseMyMoney = 30;
 	const [ inputBets, setInputBets ] = useState(0);
 	const [ buttonBets, setButtonBets ] = useState(0);
 	const [ bets, setBets ] = useState(0);
@@ -49,7 +49,6 @@ export default function Home() {
 			method: "POST",
 			header: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				socketId: socketId,
 				baseMyMoney: baseMyMoney,
 				baseMoney: baseMoney,
 				players: players
@@ -74,7 +73,6 @@ export default function Home() {
 			method: "POST",
 			header: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				socketId: socketId,
 				myCards: myCards,
 				bets: bets,
 				bigOrSmall: bigOrSmall
@@ -92,10 +90,7 @@ export default function Home() {
 		const apiUrlEndpoint = `/api/setNextPlayer`;
 		const getData = {
 			method: "POST",
-			header: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				socketId: socketId
-			})
+			header: { "Content-Type": "application/json" }
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
@@ -116,8 +111,9 @@ export default function Home() {
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		let res = await response.json();
-		console.log(res)
-		if(!res) {
+		if(res.error=="login fail"){
+			displayBlock('loginFail');
+		}else if(!res) {
 			displayBlock('waiting');
 		}else{
 			displayBlock('game');
@@ -231,7 +227,7 @@ export default function Home() {
 			body: JSON.stringify({
 				baseMoney: baseMoney,
 				baseMyMoney: baseMyMoney,
-				totalMoney: totalMoney
+				//totalMoney: totalMoney
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
@@ -255,6 +251,7 @@ export default function Home() {
 		document.getElementById(styles['game']).style.display = "none";
 		document.getElementById(styles['gameOver']).style.display = "none";
 		document.getElementById(styles['waiting']).style.display = "none";
+		document.getElementById(styles['loginFail']).style.display = "none";
 		document.getElementById(styles[value]).style.display = "block";
 	}
 
@@ -272,6 +269,7 @@ export default function Home() {
 	},[socketId]);
 
 	useEffect(()=>{
+		console.log(players)
 		let playersMoney = [];
 		let playersGroup = [];
 		let baseAllMoney = players.length * baseMyMoney;
@@ -294,12 +292,12 @@ export default function Home() {
 			//剩餘錢最少的玩家
 			if(player.money < minMoney){
 				minMoney = player.money;
-				minMoneyPlayer = player.playerId;
+				minMoneyPlayer = player.autoIncreNum;
 			}
 			//剩餘錢最多的玩家
 			if(player.money > maxMoney){
 				maxMoney = player.money;
-				maxMoneyPlayer = player.playerId;
+				maxMoneyPlayer = player.autoIncreNum;
 			}
 			totalPlayersMoney += player.money;
 			let playerName = '';
@@ -311,8 +309,8 @@ export default function Home() {
 			if(player.isCurrentPlayer){
 				setCurrentPlayer(player.playerId)
 			}
-			playersGroup[player.playerId] = {name:playerName, playerId:player.playerId, money:player.money};
-			if(player.rowNum % 2 == 0){
+			playersGroup[index] = {autoIncreNum:player.autoIncreNum, name:playerName, playerId:player.playerId, money:player.money, };
+			if(index+1 % 2 == 0){
 				playersMoney.push(playersGroup);
 				playersGroup = [];
 			}
@@ -371,7 +369,7 @@ export default function Home() {
 	let theDealCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.deal} onClick={dealCards} disabled={!isMyTurn || myCards[0].number}>重新發牌</button>
 	</>
-	if(!isAnyPlayerCanPlay){
+	if(!isAnyPlayerCanPlay || (totalMoney <=0 && isAnyPlayerCantPlay)){
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gameOver}>遊戲結束</button>;
 	}else if(myMoney<20 && isMyTurn){
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>;
@@ -476,6 +474,10 @@ export default function Home() {
 			<div className={styles.mainContent} id={styles.waiting}>
 				<h1 className={styles.h1}></h1>
 				<div className={styles.waitingText}>遊戲進行中，請稍候</div>
+			</div>
+			<div className={styles.mainContent} id={styles.loginFail}>
+				<h1 className={styles.h1}></h1>
+				<div className={styles.waitingText}>您已於此裝置登入遊戲</div>
 			</div>
 		</>
 	)

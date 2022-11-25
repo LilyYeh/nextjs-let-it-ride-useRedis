@@ -1,5 +1,6 @@
-import { countCards, getCards, shuffle } from "../../lib/db_cards";
-import {goaling, setNextPlayer} from "../../lib/db_players";
+import {countCards, createCards, foldCards, getCards} from "../../lib/redis_cards";
+import { goaling, setNextPlayer } from "../../lib/redis_player";
+import { getCookie } from 'cookies-next';
 
 /*
  * return 一張撲克牌
@@ -12,12 +13,13 @@ export default async function handler(req, res) {
 
 		// fail 重新洗牌
 		if(totalCards < 1){
-			await shuffle();
+			// create cards 建立牌庫(52張)
+			await createCards();
 		}
 
 		// 拿取手牌
-		const socketId = JSON.parse(req.body).socketId;
-		const card = await getCards(socketId,1);
+		const cookieId = await getCookie('cookieId', { req, res });
+		const card = await getCards(cookieId,1);
 		const my3edCards = card[0];
 
 		// 射龍門
@@ -40,9 +42,12 @@ export default async function handler(req, res) {
 			}
 		}
 
-		await goaling(socketId, bets);
+		await goaling(cookieId, bets);
 
-		const players = await setNextPlayer(socketId);
+		// 棄牌
+		await foldCards(cookieId);
+
+		const players = await setNextPlayer();
 
 		res.status(200).json({my3edCards: my3edCards, players: players});
 	} catch (error) {
