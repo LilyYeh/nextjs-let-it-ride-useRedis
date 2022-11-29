@@ -4,10 +4,10 @@ import styles from "./index.module.scss";
 
 const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 
-export default function playerMoney({playerData, currentPlayer, baseMyMoney, getCardFlag}) {
+export default function playerMoney({playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole}) {
 	const [ money, setMoney ]=useState(playerData.money);
 	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
-
+	const [ playerId, setPlayerId ]=useState(playerData.playerId);
 
 	useEffect(() => {
 		if(getCardFlag){
@@ -23,12 +23,33 @@ export default function playerMoney({playerData, currentPlayer, baseMyMoney, get
 		}
 
 		setMoney(playerData.money);
-	},[playerData.money,getCardFlag]);
+	},[getCardFlag,playerData.money,playerData.playerId]);
+
+	useEffect(() => {
+		setStyle(styles[players_img[playerId]]);
+	},[playerId]);
+
+	async function changeRole(e) {
+		if (e.currentTarget.classList.contains(styles['isMe'])) {
+			const apiUrlEndpoint = `/api/changeRole`;
+			const getData = {
+				method: "POST",
+				header: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					playerId: playerId
+				})
+			}
+			const response = await fetch(apiUrlEndpoint, getData);
+			const res = await response.json();
+			setPlayerId(res.playerId);
+			updateRole(playerData.autoIncreNum,res.playerId);
+		}
+	}
 
 	return (
 		<>
-			<td className={style + ' ' + (currentPlayer==playerData.playerId? styles.me : '') + ' ' + styles[playerData.name]}>
-				<span className={styles.myMoney}>${useRate(playerData.money, baseMyMoney)}</span>
+			<td className={style + ' ' + (currentPlayer==playerData.autoIncreNum? styles.me : '') + ' ' + styles[playerData.name]} onClick={changeRole}>
+				<span className={styles.myMoney}><img src={"/images/privateMoney.png"}/>{useRate(playerData.money, baseMyMoney)}</span>
 			</td>
 		</>
 	)

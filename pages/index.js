@@ -25,6 +25,7 @@ export default function Home() {
 
 	const baseMoney = 10;
 	const baseMyMoney = 1000;
+	const [ betsButtons, setBetsButtons ] = useState([{num:10,active:false},{num:30,active:false},{num:50,active:false}]);
 	const [ inputBets, setInputBets ] = useState(0);
 	const [ buttonBets, setButtonBets ] = useState(0);
 	const [ bets, setBets ] = useState(0);
@@ -255,6 +256,16 @@ export default function Home() {
 		document.getElementById(styles[value]).style.display = "block";
 	}
 
+	function updateRole(autoIncreNum,newPlayerId) {
+		// socket broadcast update player
+		players.forEach((player,index)=>{
+			if(player.autoIncreNum == autoIncreNum){
+				players[index].playerId = newPlayerId;
+			}
+		});
+		socket.emit('update-players',players);
+	}
+
 	useEffect(()=>{
 		socketInitializer();
 	},[]);
@@ -269,7 +280,6 @@ export default function Home() {
 	},[socketId]);
 
 	useEffect(()=>{
-		console.log(players)
 		let playersMoney = [];
 		let playersGroup = [];
 		let baseAllMoney = players.length * baseMyMoney;
@@ -302,12 +312,12 @@ export default function Home() {
 			totalPlayersMoney += player.money;
 			let playerName = '';
 			if(player.socketId == socketId){
-				setMyId(player.playerId);
+				setMyId(player.autoIncreNum);
 				setMyMoney(player.money);
 				playerName = 'isMe';
 			}
 			if(player.isCurrentPlayer){
-				setCurrentPlayer(player.playerId)
+				setCurrentPlayer(player.autoIncreNum)
 			}
 			playersGroup[index] = {autoIncreNum:player.autoIncreNum, name:playerName, playerId:player.playerId, money:player.money, };
 			if(index+1 % 2 == 0){
@@ -340,6 +350,7 @@ export default function Home() {
 	},[currentPlayer,myId]);
 
 	useEffect(()=>{
+		//若兩張牌一樣，選擇比大比小
 		if(myCards[0].number>0 && myCards[0].number == myCards[1].number){
 			if(myCards[0].number >= 7){
 				setBigOrSmall('small');
@@ -349,7 +360,22 @@ export default function Home() {
 		}else{
 			setBigOrSmall('');
 		}
-	},[myCards]);
+
+		chb();
+
+		async function chb(){
+			for(let i=0; i<betsButtons.length; i++){
+				const myBets = await checkBets(betsButtons[i].num);
+				if(myBets == betsButtons[i].num) {
+					betsButtons[i].active = true;
+				}else{
+					betsButtons[i].active = false;
+				}
+			}
+			setBetsButtons(betsButtons);
+		}
+
+	},[myCards,totalMoney]);
 
 	useEffect(()=>{
 		if(ranking.length > 0){
@@ -382,8 +408,13 @@ export default function Home() {
 				<title>射龍門</title>
 			</Head>
 			<div className={styles.mainContent} id={styles.game}>
-				<h1 className={styles.h1}></h1>
-				<div className={styles.publicMoney}>${useRate(totalMoney)}</div>
+				<div className={styles.topColumn}>
+					<h1 className={styles.h1}></h1>
+					<div className={styles.rightColumn}>
+						<div className={styles.playNum}>局數：10</div>
+						<div className={styles.publicMoney}><img src={"/images/publicMoney.png"}/>{useRate(totalMoney)}</div>
+					</div>
+				</div>
 				<div className={styles.myGameBoard}>
 					<div className={styles.gameBoard}>
 						<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
@@ -394,16 +425,20 @@ export default function Home() {
 						<label className={styles.title}>下注</label>
 						<div className={styles.bigOrSmallArea+(myCards[0].number==myCards[1].number? " "+styles.active : "")}>
 							<span className={styles.inputRadio} onClick={(e) => setBigOrSmall('big')}>
-								<input type="radio" name="bigOrSmall" value="big" onChange={(e) => setBigOrSmall('big')} checked={bigOrSmall=='big'} />大
+								<input type="radio" name="bigOrSmall" value="big" onChange={(e) => setBigOrSmall('big')} checked={bigOrSmall=='big'} />比大
 							</span>
 							<span className={styles.inputRadio} onClick={(e) => setBigOrSmall('small')}>
-								<input type="radio" name="bigOrSmall" value="small" onChange={(e) => setBigOrSmall('small')} checked={bigOrSmall=='small'} />小
+								<input type="radio" name="bigOrSmall" value="small" onChange={(e) => setBigOrSmall('small')} checked={bigOrSmall=='small'} />比小
 							</span>
 						</div>
-						<div className={styles.coin+(inputBets==10? " "+styles.active : "")} onClick={() => onChangeButtonBets(10)}>$10</div>
-						<div className={styles.coin+(inputBets==30? " "+styles.active : "")} onClick={() => onChangeButtonBets(30)}>$30</div>
-						<div className={styles.coin+(inputBets==50? " "+styles.active : "")} onClick={() => onChangeButtonBets(50)}>$50</div>
-						<div className={styles.inputCoin+" "+(bets && bets==inputBets? styles.active : "")}>
+						{
+							betsButtons.map((bt) => {
+								return(
+									<div key={bt.num} className={`${styles.coin} ${inputBets==bt.num? styles.active : ""} ${bt.active? "" : styles.disabled}`} onClick={() => onChangeButtonBets(bt.num)}>${bt.num}</div>
+								)
+							})
+						}
+						<div className={`${styles.inputCoin} ${bets && bets==inputBets? styles.active : ""}`}>
 							<button className={styles.minus} onClick={() => onChangeInputBets('-')}>–</button>
 							<input type="text" value={`$${inputBets}`} onChange={onChangeInputBets}/>
 							<button className={styles.plus} onClick={() => onChangeInputBets('+')}>+</button>
@@ -432,6 +467,7 @@ export default function Home() {
 												                     currentPlayer={currentPlayer}
 												                     baseMyMoney={baseMyMoney}
 												                     getCardFlag={getCardFlag}
+												                     updateRole={updateRole}
 												/>)
 											})
 										}

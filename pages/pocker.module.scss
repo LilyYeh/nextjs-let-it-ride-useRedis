@@ -259,9 +259,11 @@
 }
 
 .bg-back {
-	width: 12rem; height: 10.5rem;
-	background: url(/images/pocker.png) 0rem 0.1rem no-repeat;
-	background-size: 14rem auto;
+	width: 12rem;
+	height: 10.4rem;
+	background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
+	background-size: 14.6rem auto;
+	border: 0.1rem solid;
 }
 
 .bg-jocker_1 {
@@ -537,9 +539,9 @@
 
 	.bg-back {
 		width: 13rem;
-		height: 11.2rem;
-		background: url(/images/pocker.png) 0rem 0.1rem no-repeat;
-		background-size: 15rem auto;
+		height: 11.1rem;
+		background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
+		background-size: 15.5rem auto;
 	}
 
 	.bg-jocker_1 {
@@ -550,5 +552,14 @@
 	.bg-jocker_2 {
 		width: 10.5rem; height: 10.8rem;
 		background: url('/images/pocker.png') -1529px -1030px;
+	}
+}
+
+@media screen and (max-width: 320px) {
+	.bg-back {
+		width: 13rem;
+		height: 10.4rem;
+		background: url(/images/pocker.png) -0.14rem -0.15rem no-repeat;
+		background-size: 14.5rem auto;
 	}
 }

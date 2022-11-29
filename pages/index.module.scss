@@ -25,6 +25,9 @@
 	background: white;
 	width: fit-content;
 	margin: 0 auto 1rem;
+	position: absolute;
+	top: 0rem;
+	left: 0rem;
 	&:after {
 		content: "";
 		display: block;
@@ -59,18 +62,43 @@
 	display: none;
 }
 
-.publicMoney {
+.topColumn{
+	position: relative;
+	width: 100%;
 	margin: auto;
-	margin-bottom: 0.5rem;
-	width: max-content;
-	font-size: 3rem;
-	font-weight: bold;
+	.rightColumn {
+		position: absolute;
+		top: 0rem;
+		right: 0rem;
+		text-align: right;
+		.playNum {
+			font-size: 1.2rem;
+			margin-bottom: 0.5rem;
+			margin-right: 0.5rem;
+		}
+		.publicMoney {
+			width: 11rem;
+			font-size: 3rem;
+			line-height: 3.8rem;
+			font-weight: bold;
+			text-align: center;
+			background: white;
+			border: 1px solid gold;
+			border-radius: 30px;
+			padding: 0 0.8rem;
+			img {
+				height: 3.8rem;
+				float: left;
+			}
+		}
+	}
 }
+
 
 .myGameBoard {
 	max-width: 376px;
 	min-height: calc(100vh - 11rem);
-	margin: auto;
+	margin: 7rem auto;
 }
 
 button.deal, button.shoot, button.pass, button.keepGoing, button.endGame, button.newGame {
@@ -166,7 +194,6 @@ button.newGame {
 
 .gameBoard {
 	display: flex;
-	//width: max-content;
 	margin: 0 auto 0.5rem;
 	.card1, .card2, .card3 {
 		display:inline-flex;
@@ -175,8 +202,6 @@ button.newGame {
 		font-weight: bold;
 		align-items: center;
 		justify-content: center;
-		//width: 8rem;
-		//min-height: 11rem;
 		img {
 			width: 100%;
 			height: auto;
@@ -255,6 +280,11 @@ button.newGame {
 			border: 2px solid grey;*/
 			background: #ffc107;
 			color:white;
+		}
+		&.disabled {
+			background: rgba(16, 16, 16, 0.03);
+			color: rgba(16, 16, 16, 0.12);
+			border: 2px solid rgba(16, 16, 16, 0.05);
 		}
 	}
 
@@ -339,17 +369,41 @@ button.newGame {
 
 	table.privateMoney {
 		margin: auto;
-		width: 100%;
+		width: 360px;
 		tr {
 			td {
-				padding: 1rem 2rem 0rem 5.2rem;
+				padding: 1rem 1rem 0rem 4.8rem;
 				width: 50%;
 				height: 4.5rem;
+				text-align: left;
 				font-size: 2rem;
 				font-weight: bold;
 				position: relative;
+				-webkit-user-select:none;
+				-moz-user-select:none;
+				-o-user-select:none;
+				user-select:none;
+				.myMoney{
+					img {
+						height: 2rem;
+						margin-right: 0.1rem;
+					}
+				}
+				&.me{
+					.myMoney{
+						position: relative;
+						&:after {
+							content: "-";
+							position: absolute;
+							top: 1.4rem;
+							left: 50%;
+							color: #dc3545;
+						}
+					}
+				}
 				&.isMe {
 					color: #dc3545;
+					cursor: pointer;
 				}
 				&:before {
 					content: "";
@@ -361,118 +415,103 @@ button.newGame {
 				}
 				&.king:before {
 					background: url(/images/players/king.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.king-win:before {
 					background: url(/images/players/king-win.svg) no-repeat;
-					background-size: 5.3rem auto;
+					background-size: 5.1rem auto;
 					width: 5.3rem;
 				}
 				&.king-lose:before {
 					background: url(/images/players/king-lose.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 					top: 0.5rem;
 				}
 				&.king2:before {
 					background: url(/images/players/king2.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.king2-win:before {
 					background: url(/images/players/king2-win.svg) no-repeat;
-					background-size: 5.5rem auto;
+					background-size: 5.3rem auto;
 					top: 0.2rem;
+					left: -0.4rem;
 					width: 5.5rem;
 				}
 				&.king2-lose:before {
 					background: url(/images/players/king2-lose.svg) no-repeat;
-					background-size: 5.5rem auto;
+					background-size: 5.3rem auto;
 					width: 5.5rem;
 				}
 				&.queen-flower:before {
 					background: url(/images/players/queen-flower.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.queen-flower-win:before {
 					background: url(/images/players/queen-flower-win.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.queen-flower-lose:before {
 					background: url(/images/players/queen-flower-lose.svg) no-repeat;
-					background-size: 6rem auto;
+					background-size: 5.8rem auto;
 					top: 0rem;
 					left: -0.5rem;
 					width: 6rem;
 				}
 				&.queen:before {
 					background: url(/images/players/queen.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.queen-win:before {
 					background: url(/images/players/queen-win.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 					top: 0.3rem;
 				}
 				&.queen-lose:before {
 					background: url(/images/players/queen-lose.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 					top: -0.3rem;
 				}
 				&.prince:before {
 					background: url(/images/players/prince.svg) no-repeat;
-					background-size: 5rem auto;
+					background-size: 4.8rem auto;
 				}
 				&.prince-win:before {
 					background: url(/images/players/prince-win.svg) no-repeat;
-					background-size: 5.5rem auto;
+					background-size: 5.3rem auto;
 					width: 5.5rem;
 				}
 				&.prince-lose:before {
 					background: url(/images/players/prince-lose.svg) no-repeat;
-					background-size: 4.5rem auto;
+					background-size: 4.3rem auto;
 				}
 				&.prince2:before {
 					background: url(/images/players/prince2.svg) no-repeat;
-					background-size: 4.3rem auto;
+					background-size: 4.1rem auto;
 					left: 0.3rem;
 				}
 				&.prince2-win:before {
 					background: url(/images/players/prince2-win.svg) no-repeat;
-					background-size: 5.5rem auto;
+					background-size: 5.3rem auto;
 					top: 0.3rem;
 					width: 5.5rem;
 				}
 				&.prince2-lose:before {
 					background: url(/images/players/prince2-lose.svg) no-repeat;
-					background-size: 4.3rem auto;
+					background-size: 4.1rem auto;
 					top: 0.3rem;
 					left: 0.3rem;
-				}
-
-				.myMoney{
-					position: relative;
-					display: flex;
-					justify-content: center;
-				}
-				&.me{
-					.myMoney{
-						&:after {
-							content: "-";
-							position: absolute;
-							top: 1.2rem;
-							color: #dc3545;
-						}
-					}
 				}
 			}
 		}
 	}
 }
 
-
 #gameOver {
 	display: none;
 	min-height: 100vh;
 	table {
+		margin-top: 7rem;
 		margin-bottom: 3rem;
 		width: 100%;
 		background: white;
@@ -496,6 +535,7 @@ button.newGame {
 	.waitingText {
 		padding: 1rem;
 		font-size: 1.4rem;
+		margin-top: 7rem;
 	}
 }
 
@@ -532,6 +572,58 @@ button.newGame {
 			td {
 				img {
 					width: 6.5rem;
+				}
+			}
+		}
+	}
+
+	.topColumn {
+		max-width: 376px;
+	}
+}
+
+@media screen and (max-width: 320px) {
+	.mainContent {
+		padding: 1rem 0;
+		max-width: 100%;
+	}
+
+	.card3 {
+		width: 5.5rem;
+	}
+
+	.bets {
+		margin: 0 0.4rem 0.5rem;
+		.coin {
+			width: 3rem;
+			height: 3rem;
+			line-height: 3rem;
+		}
+		.inputCoin {
+			input {
+				width: 3.6rem;
+			}
+			.plus, .minus {
+				width: 2.5rem;
+			}
+		}
+	}
+
+	#menu {
+		table.privateMoney {
+			width: 320px;
+		}
+	}
+
+	.topColumn{
+		width: calc(100% - 0.4rem);
+		.rightColumn {
+			.publicMoney {
+				width: 8rem;
+				font-size: 2rem;
+				line-height: 2.8rem;
+				img {
+					height: 2.8rem;
 				}
 			}
 		}
