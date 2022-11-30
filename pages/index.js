@@ -408,12 +408,11 @@ export default function Home() {
 				<title>射龍門</title>
 			</Head>
 			<div className={styles.mainContent} id={styles.game}>
+				<h1 className={styles.h1}></h1>
 				<div className={styles.topColumn}>
-					<h1 className={styles.h1}></h1>
-					<div className={styles.rightColumn}>
-						<div className={styles.playNum}>局數：10</div>
-						<div className={styles.publicMoney}><img src={"/images/publicMoney.png"}/>{useRate(totalMoney)}</div>
-					</div>
+					<div className={styles.playNum}>局數：10</div>
+					<div className={styles.otherMoney}><img src={"/images/otherMoney.png"}/>{useRate(totalMoney)}</div>
+					<div className={styles.publicMoney}><img src={"/images/publicMoney.png"}/>{useRate(totalMoney)}</div>
 				</div>
 				<div className={styles.myGameBoard}>
 					<div className={styles.gameBoard}>
@@ -481,7 +480,11 @@ export default function Home() {
 			</div>
 			<div className={styles.mainContent} id={styles['gameOver']}>
 				<h1 className={styles.h1}></h1>
-				<div className={styles.publicMoney}>${totalMoney}</div>
+				<div className={styles.topColumn}>
+					<div className={styles.playNum}>局數：10</div>
+					<div className={styles.otherMoney}><img src={"/images/otherMoney.png"}/>{useRate(totalMoney)}</div>
+					<div className={styles.publicMoney}><img src={"/images/publicMoney.png"}/>{useRate(totalMoney)}</div>
+				</div>
 				<table>
 					<thead>
 						<tr>

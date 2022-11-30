@@ -49,7 +49,8 @@ export default function playerMoney({playerData, currentPlayer, baseMyMoney, get
 	return (
 		<>
 			<td className={style + ' ' + (currentPlayer==playerData.autoIncreNum? styles.me : '') + ' ' + styles[playerData.name]} onClick={changeRole}>
-				<span className={styles.myMoney}><img src={"/images/privateMoney.png"}/>{useRate(playerData.money, baseMyMoney)}</span>
+				<div className={styles.icon}><img src={"/images/otherMoney.png"}/> <img src={"/images/privateMoney.png"} className={styles.privateMoney}/></div>
+				<span className={styles.myMoney}>{useRate(playerData.money, baseMyMoney)}</span>
 			</td>
 		</>
 	)
