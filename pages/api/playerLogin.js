@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 			const baseMoney = JSON.parse(req.body).baseMoney;
 			const baseMyMoney = JSON.parse(req.body).baseMyMoney;
 			const money = baseMyMoney-baseMoney;
-			const playerId = Math.floor(Math.random() * 5);
+			const playerId = Math.floor(Math.random() * 6);
 
 			// create redis
 			const allPlayers = await countAllPlayers();

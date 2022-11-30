@@ -11,10 +11,8 @@ export default async function handler(req, res) {
 		const playerId = JSON.parse(req.body).playerId;
 		let newPlayerId = playerId;
 		while(newPlayerId == playerId) {
-			newPlayerId = await Math.floor(Math.random() * 5);
-			console.log('in while',playerId,newPlayerId);
+			newPlayerId = await Math.floor(Math.random() * 6);
 		}
-		console.log('end while',newPlayerId);
 		await updatePlayer({cookieId:cookieId, playerId:newPlayerId});
 
 		res.status(200).json({playerId: newPlayerId});
