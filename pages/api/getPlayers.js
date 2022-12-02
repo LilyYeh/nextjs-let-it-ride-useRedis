@@ -1,4 +1,4 @@
-import { getPlayers } from "../../lib/db_players";
+import { getAllPlayers } from "../../lib/redis_player";
 
 /*
  * return 一張撲克牌
@@ -6,7 +6,7 @@ import { getPlayers } from "../../lib/db_players";
  */
 export default async function handler(req, res) {
 	try {
-		const players = await getPlayers();
+		const players = await getAllPlayers();
 
 		res.status(200).json(players);
 	} catch (error) {

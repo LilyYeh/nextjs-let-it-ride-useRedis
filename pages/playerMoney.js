@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 
 const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 
-export default function playerMoney({playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole}) {
+export default function playerMoney({socketId, playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole}) {
 	const [ money, setMoney ]=useState(playerData.money);
 	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
 	const [ playerId, setPlayerId ]=useState(playerData.playerId);
@@ -48,10 +48,10 @@ export default function playerMoney({playerData, currentPlayer, baseMyMoney, get
 
 	return (
 		<>
-			<td className={style + ' ' + (currentPlayer==playerData.autoIncreNum? styles.me : '') + ' ' + styles[playerData.name]} onClick={changeRole}>
-				<div className={styles.icon}><img src={"/images/otherMoney.png"}/> <img src={"/images/privateMoney.png"} className={styles.privateMoney}/></div>
+			<li className={`${style} ${currentPlayer==playerData.autoIncreNum? styles.me : ''} ${socketId==playerData.socketId? styles.isMe : ''}`} onClick={changeRole}>
+				<div className={styles.icon}><img src={"/images/otherMoney.png"} className={styles.otherMoney}/> <img src={"/images/privateMoney.png"} className={styles.privateMoney}/></div>
 				<span className={styles.myMoney}>{useRate(playerData.money, baseMyMoney)}</span>
-			</td>
+			</li>
 		</>
 	)
 }

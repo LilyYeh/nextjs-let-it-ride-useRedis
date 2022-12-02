@@ -5,6 +5,9 @@
 	overflow-x: hidden;
 	max-width: calc(100% - 2rem);
 	z-index: 1;
+	&.GameOver {
+		min-height: 100vh;
+	}
 	&:before {
 		content: " ";
 		position: absolute;
@@ -55,45 +58,48 @@
 	}
 }
 
-#game {
-	display: none;
-}
-
 .topColumn {
 	width: 100%;
 	margin: 0 auto 1rem;
 	position: relative;
 	.playNum {
 		position: absolute;
-		top: -2rem;
+		top: -0.2rem;
 		right: 0rem;
 		font-size: 1.2rem;
 	}
-	.otherMoney, .publicMoney {
-		width: 10rem;
-		font-size: 2.6rem;
-		line-height: 3.4rem;
+	.otherMoney {
+		//border: 0.15rem solid #9c27b0;
+		width: 6.8rem;
+		font-size: 1.8rem;
+		line-height: 2.1rem;
+		font-weight: bold;
+		text-align: center;
+		position: absolute;
+		top: 1.2rem;
+		right: 0;
+		img {
+			height: 2.4rem;
+		}
+	}
+	.publicMoney {
+		display: block;
+		border: 0.15rem solid gold;
+		width: 10.5rem;
+		font-size: 2.8rem;
+		line-height: 3.6rem;
 		font-weight: bold;
 		text-align: center;
 		background: white;
 		border-radius: 30px;
 		padding: 0 0.8rem;
+		margin: auto;
 		img {
 			height: 3.4rem;
 			float: left;
 		}
 	}
-	.otherMoney {
-		display: inline-block;
-		border: 0.15rem solid #9c27b0;
-	}
-	.publicMoney {
-		display: inline-block;
-		float: right;
-		border: 0.15rem solid gold;
-	}
 }
-
 
 .myGameBoard {
 	max-width: 376px;
@@ -367,13 +373,16 @@ button.newGame {
 		border-radius: 0.4rem;
 	}
 
-	table.privateMoney {
-		margin: auto;
-		width: 360px;
-		tr {
-			td {
+	.privateMoneyWrapper {
+		margin: 0 auto 0.2rem;
+		overflow-x: scroll;
+		overflow-y: hidden;
+		ul.privateMoney {
+			display: flex;
+			li {
+				display: inline-block;
 				padding: 0.5rem 1rem 0rem 5.2rem;
-				width: 50%;
+				min-width: 4.5rem;
 				height: 4.5rem;
 				text-align: left;
 				font-size: 2rem;
@@ -383,35 +392,45 @@ button.newGame {
 				-moz-user-select:none;
 				-o-user-select:none;
 				user-select:none;
+				order: 2;
 				.icon {
-					display: none;
+					display: flex;
+					align-items: center;
+					font-size: 1.6rem;
+					margin-top: -0.5rem;
+					margin-bottom: 0.2rem;
+					img {
+						height: 2rem;
+					}
+					img.otherMoney {
+						display: block;
+					}
+					img.privateMoney {
+						display: none;
+						height: 1.6rem;
+						margin: 0.2rem 0 0.2rem 0.2rem;
+					}
 				}
-				.myMoney{
+				.myMoney {
 					img {
 						height: 2rem;
 						margin-right: 0.1rem;
 					}
 				}
-				&.me{
+				&.me {
 					.icon {
-						display: flex;
-						align-items: center;
-						font-size: 1.6rem;
-						margin-top: -0.5rem;
-						margin-bottom: 0.2rem;
-						img {
-							height: 2rem;
+						img.otherMoney {
+							display: none;
 						}
 						img.privateMoney {
-							height: 1.6rem;
-							margin-left: 0.2rem;
-							margin-top: 0.2rem;
+							display: block;
 						}
 					}
 				}
 				&.isMe {
 					color: #dc3545;
 					cursor: pointer;
+					order: 1;
 				}
 				&:before {
 					content: "";
@@ -442,7 +461,6 @@ button.newGame {
 				&.king2-win:before {
 					background: url(/images/players/king2-win.svg) no-repeat;
 					background-size: 5.3rem auto;
-					top: 0.2rem;
 					left: -0.4rem;
 					width: 5.5rem;
 				}
@@ -501,7 +519,6 @@ button.newGame {
 				&.prince2-win:before {
 					background: url(/images/players/prince2-win.svg) no-repeat;
 					background-size: 5.3rem auto;
-					top: 0.3rem;
 					width: 5.5rem;
 				}
 				&.prince2-lose:before {
@@ -513,38 +530,41 @@ button.newGame {
 			}
 		}
 	}
-}
 
-#gameOver {
-	display: none;
-	min-height: 100vh;
-	table {
-		margin-top: 7rem;
-		margin-bottom: 3rem;
-		width: 100%;
-		background: white;
-		th {
-			font-weight: bold;
-			background: gold;
-		}
-		th, td {
-			border: 1px solid;
-			text-align: center;
-			padding: 1rem;
-			font-size: 1.4rem;
-		}
+	.privateMoneyWrapper::-webkit-scrollbar {
+		height: 0.4rem;
+	}
+
+	.privateMoneyWrapper::-webkit-scrollbar-thumb {
+		background-color: #afafaf;
+		border-radius: 10px;
 	}
 }
 
-#waiting, #loginFail {
-	display: none;
-	min-height: 100vh;
-	text-align: center;
-	.waitingText {
-		padding: 1rem;
+table.gameOver {
+	margin-bottom: 3rem;
+	width: 100%;
+	background: white;
+	th {
+		font-weight: bold;
+		background: gold;
+	}
+	th, td {
+		border: 1px solid;
+		text-align: center;
+		padding: 1rem 0.5rem;
 		font-size: 1.4rem;
-		margin-top: 7rem;
+		img {
+			width: 60%;
+		}
 	}
+}
+
+.waiting.waitingText, .loginFail.waitingText {
+	min-height: 80vh;
+	margin-top: 5rem;
+	text-align: center;
+	font-size: 1.4rem;
 }
 
 @media screen and (min-width: 377px) {
@@ -568,21 +588,14 @@ button.newGame {
 			}
 		}
 
-		table.privateMoney {
+		.privateMoneyWrapper {
 			width: 376px;
 		}
 	}
 
-	#gameOver {
-		table {
-			max-width: 376px;
-			margin: 0 auto 3rem;
-			td {
-				img {
-					width: 6.5rem;
-				}
-			}
-		}
+	table.gameOver {
+		max-width: 376px;
+		margin: 0 auto 3rem;
 	}
 
 	.topColumn {
@@ -617,12 +630,6 @@ button.newGame {
 		}
 	}
 
-	#menu {
-		table.privateMoney {
-			width: 320px;
-		}
-	}
-
 	.topColumn{
 		.otherMoney, .publicMoney {
 			width: 8rem;
@@ -632,5 +639,9 @@ button.newGame {
 				height: 2.8rem;
 			}
 		}
+	}
+
+	#menu {
+		width: 100%;
 	}
 }

@@ -20,7 +20,7 @@ export default function playerRanking({ranking, playerData, baseMyMoney, minPriv
 		<tr>
 			<td>{ranking}</td>
 			<td><img src={`/images/players/${playerName}.svg`} /></td>
-			<td>{baseMyMoney}</td>
+			<td>${baseMyMoney}</td>
 			<td>{totalMyMoneyText}</td>
 		</tr>
 	)
