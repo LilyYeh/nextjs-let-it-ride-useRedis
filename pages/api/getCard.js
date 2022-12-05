@@ -1,6 +1,7 @@
 import {countCards, createCards, foldCards, getCards} from "../../lib/redis_cards";
 import { goaling, setNextPlayer } from "../../lib/redis_player";
 import { getCookie } from 'cookies-next';
+import {updateGameNumber} from "../../lib/redis_game";
 
 /*
  * return 一張撲克牌
@@ -46,6 +47,12 @@ export default async function handler(req, res) {
 
 		// 棄牌
 		await foldCards(cookieId);
+
+		// 檯面上沒錢了(add 局數)？
+		const totalMoney = JSON.parse(req.body).totalMoney;
+		if(totalMoney - bets <=0) {
+			await updateGameNumber();
+		}
 
 		const players = await setNextPlayer();
 

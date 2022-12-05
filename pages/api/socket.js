@@ -24,11 +24,7 @@ export default function handler(req, res) {
 		});
 
 		socket.on('update-players', playersData => {
-			async function getply(){
-				//playersData = await getPlayers();
-				socket.broadcast.emit('update-players', playersData);
-			}
-			getply();
+			socket.broadcast.emit('update-players', playersData);
 		});
 
 		socket.on('set-next-player', playersData => {

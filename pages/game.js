@@ -29,6 +29,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	const [ getCardFlag, setClickedGetCard ] = useState(false);
 	const [ isNavOpen, setNavOpen ] = useState(false);
 
+	const [gameNumber, setNumber] = useState('0/10');
+
 	async function dealCards(e) {
 		// 人物表情 Default
 		setClickedGetCard(false);
@@ -53,7 +55,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		broadcast('update-players',res.data.players);
 	}
 
-	async function getCard(e) {
+	async function getCard(e)   {
 		// 人物表情變換
 		setClickedGetCard(true);
 		broadcast('clicked-getCard',true);
@@ -66,7 +68,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			body: JSON.stringify({
 				myCards: myCards,
 				bets: bets,
-				bigOrSmall: bigOrSmall
+				bigOrSmall: bigOrSmall,
+				totalMoney: totalMoney
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
@@ -141,6 +144,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	async function newGame() {
 		const res = await getNewGameData();
 		setDefault(res)
+		getGameNumber();
 		broadcast('new-game',res);
 	}
 
@@ -174,6 +178,18 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		setNavOpen(false);
 	}
 
+	async function getGameNumber() {
+		const apiUrlEndpoint = `/api/gameNumber`;
+		const getData = {
+			method: "GET",
+			header: { "Content-Type": "application/json" }
+		}
+		const response = await fetch(apiUrlEndpoint, getData);
+		const res = await response.json();
+		setNumber(res.game.number+'/'+res.game.ttl);
+		return res;
+	}
+
 	function updateRole(autoIncreNum,newPlayerId) {
 		players.forEach((player,index)=>{
 			if(player.autoIncreNum == autoIncreNum){
@@ -197,6 +213,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				// 人物表情 Default
 				setClickedGetCard(false);
 				setDefault(broadcastData.data);
+				getGameNumber();
 				break;
 
 			case "clicked-getCard":
@@ -210,8 +227,6 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	},[broadcastData]);
 
 	useEffect(()=>{
-		let playersMoney = [];
-		let playersGroup = [];
 		let baseAllMoney = players.length * baseMyMoney;
 		let totalPlayersMoney = 0;
 		let canPlay = false;
@@ -226,24 +241,14 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				someoneCantPlay = true;
 			}
 			totalPlayersMoney += player.money;
-			let playerName = '';
 			if(player.socketId == socketId){
 				setMyId(player.autoIncreNum);
 				setMyMoney(player.money);
-				playerName = 'isMe';
 			}
 			if(player.isCurrentPlayer){
 				setCurrentPlayer(player.autoIncreNum)
 			}
-			playersGroup[index] = {autoIncreNum:player.autoIncreNum, name:playerName, playerId:player.playerId, money:player.money, };
-			if(index+1 % 2 == 0){
-				playersMoney.push(playersGroup);
-				playersGroup = [];
-			}
 		});
-		if(playersGroup.length > 0){
-			playersMoney.push(playersGroup);
-		}
 		setTotalMoney(baseAllMoney - totalPlayersMoney);
 		setIsAnyPlayerCanPlay(canPlay);
 		setIsAnyPlayerCantPlay(someoneCantPlay);
@@ -270,6 +275,12 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		}
 	},[myCards]);
 
+	useEffect(()=>{
+		if(totalMoney <= 0){
+			getGameNumber();
+		}
+	},[totalMoney]);
+
 	let the3edCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || bets<=0 || totalMoney <=0}>射</button>
 		<button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={!isMyTurn || !myCards[0].number || totalMoney <=0}>pass</button>
@@ -281,7 +292,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	let theDealCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.deal} onClick={dealCards} disabled={!isMyTurn || myCards[0].number}>重新發牌</button>
 	</>
-	if(!isAnyPlayerCanPlay || (totalMoney <=0 && isAnyPlayerCantPlay)){
+	if(!isAnyPlayerCanPlay || (totalMoney <=0 && isAnyPlayerCantPlay) || gameNumber==10){
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gemeOver}>遊戲結束</button>;
 	}else if(myMoney<20 && isMyTurn){
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>;
@@ -289,7 +300,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 
 	return (
 		<>
-			<TotalMoney ttlMoney={totalMoney}/>
+			<TotalMoney ttlMoney={totalMoney} gameNumber={gameNumber}/>
 			<div className={styles.myGameBoard}>
 				<div className={styles.gameBoard}>
 					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
@@ -328,7 +339,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 					<li><button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gemeOver}>遊戲結束</button></li>
 					<li><button className={'btn '+'btn-red-outline '+styles.newGame} onClick={newGame}>重新遊戲</button></li>
 				</ul>
-				<div className={styles.openNav} onClick={()=>setNavOpen(isNavOpen? false:true)}>{isNavOpen?'✕':<img src={"/images/atom.png"}/>}︎</div>
+				<div className={styles.openNav} onClick={()=>setNavOpen(isNavOpen? false:true)}></div>
 				<div className={styles.privateMoneyWrapper}>
 					<ul className={styles.privateMoney}>
 						{

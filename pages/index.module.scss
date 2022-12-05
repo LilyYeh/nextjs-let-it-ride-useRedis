@@ -64,9 +64,36 @@
 	position: relative;
 	.playNum {
 		position: absolute;
-		top: -0.2rem;
+		top: 0.2rem;
 		right: 0rem;
-		font-size: 1.2rem;
+		font-size: 1.4rem;
+		.title {
+			display: flex;
+			align-items: center;
+			margin-bottom: 0.5rem;
+			.gameSetting {
+				width: 1.8rem;
+				height: 1.8rem;
+				margin-left: 0.4rem;
+				font-size: 1.8rem;
+				font-weight: bold;
+				color: #000000;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: white;
+				box-shadow: 0rem 0.1rem 0.3rem rgb(0 0 0 / 30%);
+				border-radius: 0.4rem;
+				cursor: pointer;
+				&:before {
+					content: "";
+					background: url(/images/atom.png) no-repeat;
+					background-size: 1.8rem;
+					width: 1.8rem;
+					height: 1.8rem;
+				}
+			}
+		}
 	}
 	.otherMoney {
 		//border: 0.15rem solid #9c27b0;
@@ -74,10 +101,10 @@
 		font-size: 1.8rem;
 		line-height: 2.1rem;
 		font-weight: bold;
-		text-align: center;
+		text-align: left;
 		position: absolute;
 		top: 1.2rem;
-		right: 0;
+		left: 0;
 		img {
 			height: 2.4rem;
 		}
@@ -348,6 +375,12 @@ button.newGame {
 			display: block;
 			+ .openNav{
 				font-size: 2rem;
+				&:before {
+					content: "✕";
+					background: white;
+					width: auto;
+					height: auto;
+				}
 			}
 		}
 		li {
@@ -371,6 +404,14 @@ button.newGame {
 		background: white;
 		box-shadow: 0rem 0.1rem 0.3rem rgb(0 0 0 / 30%);
 		border-radius: 0.4rem;
+		cursor: pointer;
+		&:before {
+			content: "";
+			background: url(/images/atom.png) no-repeat;
+			background-size: 2.5rem;
+			width: 2.5rem;
+			height: 2.5rem;
+		}
 	}
 
 	.privateMoneyWrapper {

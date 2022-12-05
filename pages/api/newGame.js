@@ -1,4 +1,5 @@
 import {getAllPlayers, updatePlayer} from "../../lib/redis_player";
+import {updateGameNumber} from "../../lib/redis_game";
 
 export default async function handler(req, res) {
 	try {
@@ -15,6 +16,9 @@ export default async function handler(req, res) {
 				money: money
 			});
 		});
+
+		//局數歸零
+		await updateGameNumber(0);
 
 		res.status(200).json(players);
 	}catch (error) {
