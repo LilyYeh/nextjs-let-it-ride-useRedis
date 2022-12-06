@@ -1,12 +1,14 @@
-import { countGame, createGame, getGame } from "../../lib/redis_game";
+import { countGame, createGame, getGame, updateTtlGameNum } from "../../lib/redis_game";
 
 export default async function handler(req, res) {
 	try {
-		if(req.method == 'GET'){
-			const isCreateGame = await countGame();
-			if(!isCreateGame){
-				await createGame();
-			}
+		const isCreateGame = await countGame();
+		if(isCreateGame == 0){
+			await createGame();
+		}
+		if(req.method == 'POST'){
+			const num = JSON.parse(req.body).ttlGameNumber;
+			await updateTtlGameNum(num);
 		}
 
 		const game = await getGame();

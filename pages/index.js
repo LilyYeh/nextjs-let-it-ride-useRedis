@@ -43,6 +43,10 @@ export default function Home() {
 		socket.on('clicked-getCard', getCardFlag => {
 			setBroadcastData({name:'clicked-getCard',data:getCardFlag});
 		});
+
+		socket.on('update-gameNumber', gameData => {
+			setBroadcastData({name:'update-gameNumber',data:gameData});
+		});
 	}
 
 	async function playerLogin() {

@@ -1,4 +1,4 @@
-import { updatePlayer } from "../../lib/redis_player";
+import {getAllPlayers, updatePlayer} from "../../lib/redis_player";
 import { getCookie } from 'cookies-next';
 
 /*
@@ -15,7 +15,9 @@ export default async function handler(req, res) {
 		}
 		await updatePlayer({cookieId:cookieId, playerId:newPlayerId});
 
-		res.status(200).json({playerId: newPlayerId});
+		const players = await getAllPlayers();
+
+		res.status(200).json({players: players});
 	} catch (error) {
 		res.status(500).json({ error:error.message });
 	}

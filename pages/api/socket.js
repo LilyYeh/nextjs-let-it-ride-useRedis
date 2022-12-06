@@ -42,6 +42,10 @@ export default function handler(req, res) {
 		socket.on('clicked-getCard',  getCardFlag => {
 			socket.broadcast.emit('clicked-getCard', getCardFlag);
 		});
+
+		socket.on('update-gameNumber',  gameData => {
+			socket.broadcast.emit('update-gameNumber', gameData);
+		});
 	});
 	res.end();
 }

@@ -9,7 +9,8 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,setBlock}) {
 	const [ minPrivateMoney, setMinPrivateMoney ] = useState(0);
 	const [ maxPrivateMoney, setMaxPrivateMoney ] = useState(0);
 
-	const [gameNumber, setNumber] = useState('0/10');
+	const [ gameNumber, setNumber ] = useState(0);
+	const [ ttlNumber, setTtlNumber ] = useState(10);
 
 	useEffect(()=>{
 		gameOver();
@@ -90,13 +91,16 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,setBlock}) {
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
-		setNumber(res.game.number+'/'+res.game.ttl);
+		setNumber(res.game.number);
+		setTtlNumber(res.game.ttl);
 		return res;
 	}
 
 	return (
 		<>
-			<TotalMoney ttlMoney={totalMoney} gameNumber={gameNumber}/>
+			<TotalMoney ttlMoney={totalMoney}
+			            gameNumber={gameNumber}
+			            ttlNumber={ttlNumber}/>
 			<table className={styles.gameOver}>
 				<thead>
 				<tr>

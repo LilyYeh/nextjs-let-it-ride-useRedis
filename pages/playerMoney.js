@@ -7,7 +7,7 @@ const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 export default function playerMoney({socketId, playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole}) {
 	const [ money, setMoney ]=useState(playerData.money);
 	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
-	const [ playerId, setPlayerId ]=useState(playerData.playerId);
+	//const [ playerId, setPlayerId ]=useState(playerData.playerId);
 
 	useEffect(() => {
 		if(getCardFlag){
@@ -25,9 +25,9 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 		setMoney(playerData.money);
 	},[getCardFlag,playerData.money,playerData.playerId]);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		setStyle(styles[players_img[playerId]]);
-	},[playerId]);
+	},[playerId]);*/
 
 	async function changeRole(e) {
 		if (e.currentTarget.classList.contains(styles['isMe'])) {
@@ -36,13 +36,13 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 				method: "POST",
 				header: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					playerId: playerId
+					playerId: playerData.playerId
 				})
 			}
 			const response = await fetch(apiUrlEndpoint, getData);
 			const res = await response.json();
-			setPlayerId(res.playerId);
-			updateRole(playerData.autoIncreNum,res.playerId);
+			//setPlayerId(res.playerId);
+			updateRole(res.players);
 		}
 	}
 
