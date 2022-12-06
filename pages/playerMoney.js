@@ -30,7 +30,6 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 			while(newPlayerId == playerData.playerId) {
 				newPlayerId = await Math.floor(Math.random() * 6);
 			}
-			updateRole(playerData.autoIncreNum,newPlayerId);
 
 			const apiUrlEndpoint = `/api/changeRole`;
 			const getData = {
@@ -42,6 +41,7 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 			}
 			const response = await fetch(apiUrlEndpoint, getData);
 			const res = await response.json();
+			updateRole(playerData.autoIncreNum,newPlayerId);
 		}
 	}
 

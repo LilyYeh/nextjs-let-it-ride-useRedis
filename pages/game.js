@@ -192,7 +192,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		return res;
 	}
 
-	function updateRole(autoIncreNum,newPlayerId) {
+	async function updateRole(autoIncreNum,newPlayerId) {
 		let newPlayers = []
 		players.forEach((player,index)=>{
 			if(player.autoIncreNum == autoIncreNum) {
@@ -200,8 +200,20 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			}
 			newPlayers.push(player);
 		});
+
 		setPlayers(newPlayers);
-		broadcast('update-players',newPlayers);
+		broadcast('update-players',[]);
+	}
+
+	async function getPlayers() {
+		const apiUrlEndpoint = `/api/getPlayers`;
+		const getData = {
+			method: "GET",
+			header: { "Content-Type": "application/json" }
+		}
+		const response = await fetch(apiUrlEndpoint, getData);
+		const res = await response.json();
+		setPlayers(res);
 	}
 
 	function setTtlGameNumber(num) {
@@ -211,7 +223,11 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	useEffect(()=>{
 		switch (broadcastData.name) {
 			case "update-players":
-				setPlayers(broadcastData.data);
+				if(broadcastData.data.length == 0){
+					getPlayers();
+				}else{
+					setPlayers(broadcastData.data);
+				}
 				break;
 
 			case "set-next-player":
