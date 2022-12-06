@@ -153,11 +153,13 @@
 					border: 0px;
 				}
 				.plus, .minus {
-					display: block;
-					float: left;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: #000000;
+					font-weight: bold;
 					width: 3rem;
 					height: 3rem;
-					text-align: center;
 					border: 0px;
 					background: transparent;
 					border-radius: 50%;
@@ -413,11 +415,13 @@ button.newGame {
 			}
 		}
 		.plus, .minus {
-			display: block;
-			float: left;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #000000;
+			font-weight: bold;
 			width: 3rem;
 			height: 3rem;
-			text-align: center;
 			border: 0px;
 			background: transparent;
 			border-radius: 50%;
@@ -568,7 +572,7 @@ button.newGame {
 				}
 				&.king2:before {
 					background: url(/images/players/king2.svg) no-repeat;
-					background-size: 4.8rem auto;
+					background-size: 4.6rem auto;
 				}
 				&.king2-win:before {
 					background: url(/images/players/king2-win.svg) no-repeat;
