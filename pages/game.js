@@ -192,9 +192,16 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		return res;
 	}
 
-	function updateRole(players) {
-		setPlayers(players);
-		broadcast('update-players',players);
+	function updateRole(autoIncreNum,newPlayerId) {
+		let newPlayers = []
+		players.forEach((player,index)=>{
+			if(player.autoIncreNum == autoIncreNum) {
+				player.playerId = newPlayerId;
+			}
+			newPlayers.push(player);
+		});
+		setPlayers(newPlayers);
+		broadcast('update-players',newPlayers);
 	}
 
 	function setTtlGameNumber(num) {

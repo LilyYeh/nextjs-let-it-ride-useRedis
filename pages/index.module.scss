@@ -627,6 +627,7 @@ button.newGame {
 				&.prince2:before {
 					background: url(/images/players/prince2.svg) no-repeat;
 					background-size: 3.9rem auto;
+					top: 0.3rem;
 					left: 0.5rem;
 				}
 				&.prince2-win:before {

@@ -8,16 +8,9 @@ import { getCookie } from 'cookies-next';
 export default async function handler(req, res) {
 	try {
 		const cookieId = await getCookie('cookieId', { req, res });
-		const playerId = JSON.parse(req.body).playerId;
-		let newPlayerId = playerId;
-		while(newPlayerId == playerId) {
-			newPlayerId = await Math.floor(Math.random() * 6);
-		}
+		const newPlayerId = JSON.parse(req.body).newPlayerId;
 		await updatePlayer({cookieId:cookieId, playerId:newPlayerId});
-
-		const players = await getAllPlayers();
-
-		res.status(200).json({players: players});
+		res.status(200).json({});
 	} catch (error) {
 		res.status(500).json({ error:error.message });
 	}
