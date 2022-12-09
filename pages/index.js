@@ -23,29 +23,55 @@ export default function Home() {
 			setSocketId(socket.id);
 		});
 
+		// 更新all使用者
 		socket.on('update-players', playersData => {
 			setBroadcastData({name:'update-players',data:playersData});
 		});
 
+		//pass
 		socket.on('set-next-player', playersData => {
 			setBroadcastData({name:'set-next-player',data:playersData});
 		});
 
+		//遊戲結束
 		socket.on('game-over', rankingData => {
 			setBlock('GameOver');
 		});
 
+		//重新遊戲
 		socket.on('new-game', playersData => {
 			setBlock('Game',playersData);
 			setBroadcastData({name:'new-game',data:playersData});
 		});
 
-		socket.on('clicked-getCard', getCardFlag => {
-			setBroadcastData({name:'clicked-getCard',data:getCardFlag});
-		});
-
+		//更新局數
 		socket.on('update-gameNumber', gameData => {
 			setBroadcastData({name:'update-gameNumber',data:gameData});
+		});
+
+		//重新發牌
+		socket.on('deal-cards', data => {  //data.players, data.cards
+			setBroadcastData({name:'deal-cards',data:data});
+		});
+
+		//射
+		socket.on('get-card', getCardFlag => {
+			setBroadcastData({name:'get-card',data:getCardFlag});
+		});
+
+		//換角色
+		socket.on('update-role', data => {  //data.players, data.card
+			setBroadcastData({name:'update-role',data:data});
+		});
+
+		//開啟or關閉diamond模式
+		socket.on('click-open-diamondMode', data => {  //player:myId, diamondBets:value
+			setBroadcastData({name:'click-open-diamondMode',data:data});
+		});
+
+		//選擇會or不會射中
+		socket.on('click-diamond-bets', data => {  //player:myId, diamondBets:value
+			setBroadcastData({name:'click-diamond-bets',data:data});
 		});
 	}
 

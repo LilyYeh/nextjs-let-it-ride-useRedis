@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 		}
 
 		//api 一定要放 res.status(200).json(myCards); 才能印出資料
-		res.status(200).json({ status:'ok', data:{ cards:sort(cards), players:players } });
+		res.status(200).json({ cards:sort(cards), players:players });
 	} catch (error) {
 		res.status(500).json({ error:error.message });
 	}

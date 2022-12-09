@@ -2,7 +2,7 @@ import styles from "./index.module.scss";
 import useRate from "./useRate";
 import {useEffect, useState, useRef} from "react";
 
-export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumber,broadcast}) {
+export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumber,broadcast,clickOpenDiamondMode,isOpenDiamondMode,isDiamondMode}) {
 	const [ isGameSettingOpen, setGameSettingOpen ] = useState(false);
 	const [ isOverlayOpen, setOverlayOpen ] = useState(false);
 	const mounted=useRef();
@@ -60,6 +60,11 @@ export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumb
 		}
 	},[ttlNumber]);
 
+	let mydev = <>{useRate(0)}</>;
+	if(!isOpenDiamondMode){
+		mydev = <>開啟</>;
+	}
+
 	return (
 		<>
 			<div className={styles.topColumn}>
@@ -79,7 +84,9 @@ export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumb
 				</div>
 				<div className={`${styles.overlay} ${isOverlayOpen? styles.active:''}`} onClick={closeSetting}></div>
 				<div className={styles.publicMoney}><img src={"/images/publicMoney.png"}/>{useRate(ttlMoney)}</div>
-				<div className={styles.otherMoney}><img src={"/images/otherMoney.png"}/>{useRate(0)}</div>
+				<div className={`${styles.otherMoney} ${isDiamondMode? styles.active:''} ${isOpenDiamondMode? '':styles.disabled}`} onClick={()=>clickOpenDiamondMode(isOpenDiamondMode?false:true)}>
+					<img src={"/images/otherMoney.png"}/>{mydev}
+				</div>
 			</div>
 		</>
 	)

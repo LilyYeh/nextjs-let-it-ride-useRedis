@@ -25,7 +25,7 @@
 .overlay {
 	visibility: hidden;
 	position: fixed;
-	z-index: 1;
+	z-index: 3;
 	top: 150%;
 	left: 0;
 	width: 100vw;
@@ -33,6 +33,7 @@
 	background-color: rgba(0, 0, 0, 0.8);
 
 	&.active {
+		cursor: pointer;
 		visibility: visible;
 		top: 0;
 	}
@@ -125,7 +126,6 @@
 			position: absolute;
 			top: 2.2rem;
 			right: 0;
-			z-index: 1;
 			background: white;
 			padding: 1rem;
 			border-radius: 0.4rem;
@@ -168,18 +168,47 @@
 			}
 		}
 	}
+	.overlay {
+		z-index: 1;
+	}
 	.otherMoney {
-		//border: 0.15rem solid #9c27b0;
+		cursor: pointer;
 		width: 6.8rem;
 		font-size: 1.8rem;
 		line-height: 2.1rem;
 		font-weight: bold;
 		text-align: left;
+		border-radius: 1.5rem;
 		position: absolute;
 		top: 1.2rem;
 		left: 0;
+		&:after {
+			content: "點擊關閉";
+			font-size: 12px;
+			color: rgba(16, 16, 16, 0.3);
+			position: absolute;
+			left: 0;
+			top: -1.3rem;
+		}
 		img {
 			height: 2.4rem;
+		}
+		&.active {
+			z-index: 4;
+			background: white;
+			border: 2px solid #c82bcb;
+		}
+		&.disabled {
+			background: white;
+			color: #c82bcb;
+			border: 2px solid #c82bcb;
+			font-size: 1rem;
+			line-height: 2.3rem;
+			padding-left: 0.2rem;
+			width: 5rem;
+			&:after {
+				content: "";
+			}
 		}
 	}
 	.publicMoney {
@@ -201,13 +230,82 @@
 	}
 }
 
-.myGameBoard {
+.myGameBoard, .diamondGameBoard {
 	max-width: 376px;
 	min-height: calc(100vh - 11rem);
 	margin: 0 auto;
 }
 
-button.deal, button.shoot, button.pass, button.keepGoing, button.endGame, button.newGame {
+.diamondGameBoard {
+	height: auto;
+	margin: 12rem 1rem 1rem;
+	padding: 1rem 0.2rem;
+	min-height: unset;
+	background: white;
+	border-radius: 0.4rem;
+	background: url(/images/background-transparent.jpg);
+	background-size: cover;
+	.gameBoard{
+		.card3 {
+			margin: 0 1.7rem;
+			&.active {
+				margin: 0 0.3rem;
+			}
+		}
+	}
+}
+
+@-webkit-keyframes  shineRed {
+	from { -webkit-box-shadow: 0 0 5px #bbb; }
+	50% { -webkit-box-shadow: 0 0 10px red; }
+	to { -webkit-box-shadow: 0 0 5px #bbb; }
+}
+.diamondBets {
+	max-width: 376px;
+	margin: auto;
+	text-align: center;
+	margin-bottom: 2rem;
+	button.lose, button.win {
+		margin: 0 1rem;
+		&.active {
+			-webkit-box-shadow: 0 0 1.2rem white;
+			border: 1px solid white;
+			/*-webkit-animation-name: shineRed;
+			-webkit-animation-duration: 3s;
+			-webkit-animation-iteration-count: infinite;*/
+		}
+	}
+	button.win {
+		color: white;
+		background: #dc3545;
+	}
+	button.lose {
+		color: white;
+		background: #000000;
+	}
+}
+
+.closeModalHint {
+	max-width: 376px;
+	margin: auto;
+	text-align: center;
+	font-size: 1rem;
+	color: white;
+	opacity: 0.8;
+	position: relative;
+	visibility: hidden;
+	&.active {
+		visibility: visible;
+	}
+	img {
+		position: absolute;
+		top: -0.8rem;
+		right: 5rem;
+		width: 2.5rem;
+	}
+}
+
+button.deal, button.shoot, button.pass, button.keepGoing, button.endGame, button.newGame, button.lose, button.win {
 	position: relative;
 	padding-left: 2rem;
 	display: inline-flex;
@@ -294,6 +392,22 @@ button.newGame {
 	}
 	&:disabled:before {
 		background: url(/images/hearts-disabled.jpg) no-repeat;
+		background-size: auto 1.4rem;
+	}
+}
+
+button.lose {
+	width: 9rem;
+	&:before {
+		background: url(/images/spades-white.svg) no-repeat;
+		background-size: auto 1.4rem;
+	}
+}
+
+button.win {
+	width: 8rem;
+	&:before {
+		background: url(/images/hearts-white.svg) no-repeat;
 		background-size: auto 1.4rem;
 	}
 }
@@ -437,7 +551,7 @@ button.newGame {
 
 #menu {
 	position: fixed;
-	bottom: 0;
+	bottom: 0.5rem;
 	font-size: 1.1rem;
 	width: calc(100% - 2rem);
 	text-align: center;
@@ -490,14 +604,16 @@ button.newGame {
 	}
 
 	.privateMoneyWrapper {
-		margin: 0 auto 0.2rem;
+		padding: 0.5rem;
+		padding-bottom: 0;
+		margin: auto;
 		overflow-x: scroll;
 		overflow-y: hidden;
 		ul.privateMoney {
 			display: flex;
 			li {
 				display: inline-block;
-				padding: 0.5rem 1rem 0rem 5.2rem;
+				padding: 0.5rem 1.5rem 0rem 5.2rem;
 				min-width: 4.5rem;
 				height: 4.5rem;
 				text-align: left;
@@ -515,8 +631,10 @@ button.newGame {
 					font-size: 1.6rem;
 					margin-top: -0.5rem;
 					margin-bottom: 0.2rem;
+					margin-left: -1rem;
 					img {
 						height: 2rem;
+						z-index: 1;
 					}
 					img.otherMoney {
 						display: block;
@@ -524,7 +642,24 @@ button.newGame {
 					img.privateMoney {
 						display: none;
 						height: 1.6rem;
-						margin: 0.2rem 0 0.2rem 0.2rem;
+						margin: 0.2rem;
+					}
+					label.playerDiamondBets{
+						&.goal, &.fail {
+							font-size: 12px;
+							border-radius: 0.2rem;
+							padding: 0.2rem 0;
+							text-align: center;
+							color: white;
+						}
+						&.goal {
+							background: #dc3545;
+							min-width: 3rem;
+						}
+						&.fail {
+							background: #000000;
+							min-width: 4rem;
+						}
 					}
 				}
 				.myMoney {
@@ -656,6 +791,15 @@ button.newGame {
 		background-color: #afafaf;
 		border-radius: 10px;
 	}
+
+	&.active {
+		z-index: 4;
+		.privateMoneyWrapper {
+			border-radius: 0.4rem;
+			background: url(/images/background-transparent.jpg);
+			background-size: cover;
+		}
+	}
 }
 
 table.gameOver {
@@ -685,6 +829,10 @@ table.gameOver {
 }
 
 @media screen and (min-width: 377px) {
+	.diamondGameBoard {
+		margin: 12rem auto 1rem;
+	}
+
 	.gameBoard {
 		.card1, .card2, .card3 {
 			margin: 0 0.5rem;

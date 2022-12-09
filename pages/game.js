@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcastData,setBlock}) {
 	const [ myId, setMyId ] = useState(0);
 	const [ players, setPlayers ] = useState([]);
-	const [ currentPlayer, setCurrentPlayer ] = useState(0);
+	const [ currentPlayer, setCurrentPlayer ] = useState({});
 	const [ isMyTurn, setMyTurn ] = useState(false);
 
 	//myCards[0]、myCards[1] 龍柱
@@ -32,10 +32,17 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	const [ gameNumber, setNumber ] = useState(0);
 	const [ ttlNumber, setTtlNumber ] = useState(10);
 
+	const [ isOpenDiamondMode, setOpenDiamondMode] = useState(false);
+	const [ isDiamondMode, setDiamondMode ] = useState(false);
+	const [ playerCards, setPlayerCards ] = useState(defaultMyCards);
+	const [ player3edCard, setPlayer3edCard ] = useState({});
+	const [ diamondBets, setDiamondBets ] = useState(false);
+	const [ playersClickDiamondBets, setPlayersClickDiamondBets ] = useState({});
+	const [ shoot, setShoot ] = useState(isOpenDiamondMode? false:true);
+
 	async function dealCards(e) {
 		// 人物表情 Default
 		setClickedGetCard(false);
-		broadcast('clicked-getCard',false);
 
 		e.target.disabled = true;
 		const apiUrlEndpoint = `/api/dealCards`;
@@ -50,16 +57,16 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
-		setMyCard(res.data.cards);
+		setMyCard(res.cards);
 		set3edCard({});
-		setPlayers(res.data.players);
-		broadcast('update-players',res.data.players);
+		setPlayers(res.players);
+		broadcast('deal-cards',{players:res.players, cards:res.cards});
+		setDiamondModeDefault();
 	}
 
 	async function getCard(e)   {
 		// 人物表情變換
 		setClickedGetCard(true);
-		broadcast('clicked-getCard',true);
 
 		e.target.disabled = true;
 		const apiUrlEndpoint = `/api/getCard`;
@@ -77,7 +84,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		const res = await response.json();
 		set3edCard(res.my3edCards);
 		setPlayers(res.players);
-		broadcast('set-next-player',res.players);
+		broadcast('get-card',{players:res.players, card:res.my3edCards});
 	}
 
 	async function nextPlayer(e) {
@@ -91,6 +98,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		const res = await response.json();
 		broadcast('set-next-player',res);
 		setDefault(res);
+		setDiamondModeDefault();
 	}
 
 	async function onChangeInputBets(value) {
@@ -202,10 +210,9 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		});
 
 		setPlayers(newPlayers);
-		broadcast('update-players',[]);
 	}
 
-	async function getPlayers() {
+	/*async function getPlayers() {
 		const apiUrlEndpoint = `/api/getPlayers`;
 		const getData = {
 			method: "GET",
@@ -214,26 +221,69 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
 		setPlayers(res);
+	}*/
+
+	async function clickOpenDiamondMode(value) {
+		setOpenDiamondMode(value);
+		broadcast('click-open-diamondMode',value);
+
+		const apiUrlEndpoint = `/api/openDiamondMode`;
+		const getData = {
+			method: "POST",
+			header: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				value: value
+			})
+		}
+		const response = await fetch(apiUrlEndpoint, getData);
+		const res = await response.json();
 	}
 
 	function setTtlGameNumber(num) {
 		setTtlNumber(num);
 	}
 
+	function clickDiamondBets(value) {
+		setDiamondBets(value);
+		const data = {player:myId, diamondBets:value};
+		broadcast('click-diamond-bets',data);
+		resetPlayersDiamondBetsData(data);
+	}
+
+	function resetPlayersDiamondBetsData(data) {
+		let newPCDB = {};
+		newPCDB[data.player.autoIncreNum] = data;
+		Object.keys(playersClickDiamondBets).forEach((key)=>{
+			if(key != data.player.autoIncreNum) {
+				newPCDB[key] = playersClickDiamondBets[key];
+			}
+		});
+		setPlayersClickDiamondBets(newPCDB);
+	}
+
+	function setDiamondModeDefault(){
+		setPlayersClickDiamondBets({});
+		setPlayer3edCard({});
+		setDiamondBets(false);
+	}
+
 	useEffect(()=>{
 		switch (broadcastData.name) {
+			// 更新all使用者
 			case "update-players":
-				if(broadcastData.data.length == 0){
-					getPlayers();
-				}else{
-					setPlayers(broadcastData.data);
+				setPlayers(broadcastData.data);
+				break;
+
+			//pass
+			case "set-next-player":
+				setDefault(broadcastData.data);
+
+				if(isOpenDiamondMode){
+					setDiamondMode(false);
 				}
 				break;
 
-			case "set-next-player":
-				setDefault(broadcastData.data);
-				break;
-
+			//重新遊戲
 			case "new-game":
 				// 人物表情 Default
 				setClickedGetCard(false);
@@ -241,13 +291,48 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				getGameNumber();
 				break;
 
-			case "clicked-getCard":
-				setClickedGetCard(broadcastData.data);
-				break;
-
+			//更新局數
 			case "update-gameNumber":
 				setNumber(broadcastData.data.number);
 				setTtlNumber(broadcastData.data.ttl);
+				break;
+
+			//重新發牌
+			case "deal-cards":
+				setClickedGetCard(false);
+				setPlayers(broadcastData.data.players);
+
+				if(isOpenDiamondMode){
+					setDiamondMode(true);
+					setPlayerCards(broadcastData.data.cards);
+					setDiamondModeDefault();
+				}
+				break;
+
+			//射
+			case "get-card":
+				setClickedGetCard(true);
+				setDefault(broadcastData.data.players);
+
+				if(isOpenDiamondMode){
+					setDiamondMode(true);
+					setPlayer3edCard(broadcastData.data.card);
+				}
+				break;
+
+			//換角色
+			case "update-role":
+				updateRole(broadcastData.data.autoIncreNum,broadcastData.data.newPlayerId);
+				break;
+
+			//開啟or關閉diamond模式
+			case "click-open-diamondMode":
+				setOpenDiamondMode(broadcastData.data);
+				break;
+
+			//選擇會or不會射中
+			case "click-diamond-bets":
+				resetPlayersDiamondBetsData(broadcastData.data);
 				break;
 
 			default:
@@ -272,11 +357,11 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			}
 			totalPlayersMoney += player.money;
 			if(player.socketId == socketId){
-				setMyId(player.autoIncreNum);
+				setMyId(player);
 				setMyMoney(player.money);
 			}
 			if(player.isCurrentPlayer){
-				setCurrentPlayer(player.autoIncreNum)
+				setCurrentPlayer(player)
 			}
 		});
 		setTotalMoney(baseAllMoney - totalPlayersMoney);
@@ -285,7 +370,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	},[players]);
 
 	useEffect(()=>{
-		if(currentPlayer == myId){
+		if(currentPlayer.autoIncreNum == myId.autoIncreNum){
 			setMyTurn(true);
 		}else{
 			setMyTurn(false);
@@ -311,8 +396,24 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		}
 	},[totalMoney]);
 
+	useEffect(()=>{
+		if(!isDiamondMode){
+			setPlayerCards(defaultMyCards);
+			setDiamondModeDefault();
+		}
+	},[isDiamondMode]);
+
+	useEffect(()=>{
+		if(isOpenDiamondMode){
+			setShoot(false);
+			if(Object.keys(playersClickDiamondBets).length >= players.length - 1){
+				setShoot(true);
+			}
+		}
+	},[playersClickDiamondBets]);
+
 	let the3edCardDev = <>
-		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || bets<=0 || totalMoney <=0}>射</button>
+		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || bets<=0 || totalMoney <=0 || !shoot}>射</button>
 		<button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={!isMyTurn || !myCards[0].number || totalMoney <=0}>pass</button>
 	</>;
 	if(my3edCards.imgName) {
@@ -328,18 +429,27 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>;
 	}
 
+	const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
+	let player3edCardDev = <img src={`/images/players/${players_img[currentPlayer.playerId]}.svg`} />;
+	if(player3edCard.imgName) {
+		player3edCardDev = '';
+	}
+
 	return (
 		<>
 			<TotalMoney ttlMoney={totalMoney}
 			            gameNumber={gameNumber}
 			            ttlNumber={ttlNumber}
 			            setTtlGameNumber={setTtlGameNumber}
-			            broadcast={broadcast}/>
+			            broadcast={broadcast}
+			            clickOpenDiamondMode={clickOpenDiamondMode}
+			            isOpenDiamondMode={isOpenDiamondMode}
+			            isDiamondMode={isDiamondMode}/>
 			<div className={styles.myGameBoard}>
 				<div className={styles.gameBoard}>
 					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
 					<div className={`${styles.card3} ${my3edCards.imgName ? pocker['bg-'+my3edCards.imgName] : ''}`}>{the3edCardDev}</div>
-					<div className={`${styles.card1} ${pocker['bg-'+myCards[1].imgName]}`}></div>
+					<div className={`${styles.card2} ${pocker['bg-'+myCards[1].imgName]}`}></div>
 				</div>
 				<div className={styles.bets+(myCards[0].number? " "+styles.active : "")}>
 					<label className={styles.title}>下注</label>
@@ -368,7 +478,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 					{theDealCardDev}
 				</div>
 			</div>
-			<div id={styles.menu}>
+			<div id={`${styles.menu}`} className={`${isDiamondMode? styles.active:''}`}>
 				<ul className={styles.nav + ' ' + (isNavOpen? styles.active:'')}>
 					<li><button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gemeOver}>遊戲結束</button></li>
 					<li><button className={'btn '+'btn-red-outline '+styles.newGame} onClick={newGame}>重新遊戲</button></li>
@@ -385,10 +495,28 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 								                     baseMyMoney={baseMyMoney}
 								                     getCardFlag={getCardFlag}
 								                     updateRole={updateRole}
+								                     broadcast={broadcast}
+								                     playersClickDiamondBets={playersClickDiamondBets}
 								/>)
 							})
 						}
 					</ul>
+				</div>
+			</div>
+			<div className={`${styles.overlay} ${isDiamondMode? styles.active:''}`} onClick={()=>setDiamondMode(player3edCard.imgName? false : true)}>
+				<div className={`${styles.diamondGameBoard}`}>
+					<div className={styles.gameBoard}>
+						<div className={`${styles.card1} ${pocker['bg-'+playerCards[0].imgName]}`}></div>
+						<div className={`${styles.card3} ${player3edCard.imgName ? pocker['bg-'+player3edCard.imgName]+' '+styles.active : ''}`}>{player3edCardDev}</div>
+						<div className={`${styles.card2} ${pocker['bg-'+playerCards[1].imgName]}`}></div>
+					</div>
+				</div>
+				<div className={styles.diamondBets}>
+					<button className={`btn btn-black-outline ${styles.lose} ${diamondBets===2? styles.active : ''}`} onClick={()=>clickDiamondBets(2)}>不會射中</button>
+					<button className={`btn btn-red-outline ${styles.win} ${diamondBets===1? styles.active : ''}`} onClick={()=>clickDiamondBets(1)}>會射中</button>
+				</div>
+				<div className={`${styles.closeModalHint} ${player3edCard.imgName? styles.active : ''}`}>
+					點擊空白處關閉視窗 <img src={"/images/tap.png"} />
 				</div>
 			</div>
 		</>
