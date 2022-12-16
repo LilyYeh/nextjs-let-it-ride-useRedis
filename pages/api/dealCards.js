@@ -23,17 +23,18 @@ export default async function handler(req, res) {
 		const cards = await getCards(cookieId,2);
 
 		const baseMoney = JSON.parse(req.body).baseMoney;
-		const baseMyMoney = JSON.parse(req.body).baseMyMoney;
+		//const baseMyMoney = JSON.parse(req.body).baseMyMoney;
 		let players = JSON.parse(req.body).players;
 
 		// 計算檯面金額
-		let baseAllMoney = players.length * baseMyMoney;
-		let totalPlayersMoney = 0;
-		players.forEach((player,index)=>{
-			totalPlayersMoney += player.money;
-		});
+		//let baseAllMoney = players.length * baseMyMoney;
+		//let totalPlayersMoney = 0;
+		//players.forEach((player,index)=>{
+		//	totalPlayersMoney += player.money;
+		//});
 		// 檯面沒錢了
-		if(baseAllMoney - totalPlayersMoney <= 0){
+		const totalMoney = JSON.parse(req.body).totalMoney
+		if(totalMoney <= 0){
 			players.forEach((player,index)=> {
 				players[index].money = player.money - baseMoney;
 				updatePlayer({

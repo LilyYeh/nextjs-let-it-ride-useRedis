@@ -18,7 +18,7 @@ export default function handler(req, res) {
 			console.log(`${socket.id} disconnect !`);
 			async function disconn(){
 				playersData = await removePlayers(socket.id);
-				socket.broadcast.emit('set-next-player', playersData);
+				socket.broadcast.emit('logout', playersData);
 			}
 			disconn();
 		});
@@ -29,8 +29,8 @@ export default function handler(req, res) {
 		});
 
 		//pass
-		socket.on('set-next-player', playersData => {
-			socket.broadcast.emit('set-next-player', playersData);
+		socket.on('set-next-player', data => {
+			socket.broadcast.emit('set-next-player', data);
 		});
 
 		//遊戲結束

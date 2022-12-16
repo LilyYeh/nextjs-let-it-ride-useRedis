@@ -1,12 +1,19 @@
-import { countAllPlayers, countPlayers, createPlayer, getAllPlayers, getOnePlayer, updatePlayer } from "../../lib/redis_player";
 import { setCookie, getCookie } from 'cookies-next';
-
+import { countAllPlayers, countPlayers, createPlayer, getAllPlayers, getOnePlayer, updatePlayer } from "../../lib/redis_player";
+import {countGame, createGame, getGame} from "../../lib/redis_game";
 
 export default async function handler(req, res) {
 	try {
 
 		const socketId = JSON.parse(req.body).socketId;
 		let cookieId = await getCookie('cookieId', { req, res });
+
+		//get diamond mode
+		const isCreateGame = await countGame();
+		if(isCreateGame == 0){
+			await createGame();
+		}
+		const game = await getGame();
 
 		//let totalPlayers = await countPlayers();
 		const players = await getAllPlayers();
@@ -25,6 +32,7 @@ export default async function handler(req, res) {
 			player = await getOnePlayer(cookieId);
 		}
 
+		//let players;
 		if(!cookieId || !player) {
 			cookieId = Math.random().toString(36).substring(7);
 			await setCookie('cookieId', cookieId, {req, res, maxAge: 60 * 60 * 24});
@@ -38,8 +46,9 @@ export default async function handler(req, res) {
 			const allPlayers = await countAllPlayers();
 			const autoIncreNum = allPlayers + 1;
 			await createPlayer({autoIncreNum:autoIncreNum, playerId:playerId, socketId:socketId, cookieId:cookieId, isCurrentPlayer:isCurrentPlayer, money:money, islogin:true});
-			const players = await getAllPlayers();
-			res.status(200).json(players);
+			let players = await getAllPlayers();
+			res.status(200).json({players:players,game:game});
+			//res.status(200).json(players);
 		}else{
 			if(player.islogin){
 				res.status(200).json({ error:"login fail" });
@@ -47,8 +56,9 @@ export default async function handler(req, res) {
 			}else{
 				// update redis
 				await updatePlayer({socketId:socketId, cookieId:cookieId, isCurrentPlayer:isCurrentPlayer, islogin:true});
-				const players = await getAllPlayers();
-				res.status(200).json(players);
+				let players = await getAllPlayers();
+				res.status(200).json({players:players,game:game});
+				//res.status(200).json(players);
 			}
 		}
 

@@ -23,14 +23,19 @@ export default function Home() {
 			setSocketId(socket.id);
 		});
 
+		//登出
+		socket.on('logout', playersData => {
+			setBroadcastData({name:'logout',data:playersData});
+		});
+
 		// 更新all使用者
 		socket.on('update-players', playersData => {
 			setBroadcastData({name:'update-players',data:playersData});
 		});
 
 		//pass
-		socket.on('set-next-player', playersData => {
-			setBroadcastData({name:'set-next-player',data:playersData});
+		socket.on('set-next-player', data => {
+			setBroadcastData({name:'set-next-player',data:data});
 		});
 
 		//遊戲結束
@@ -41,7 +46,7 @@ export default function Home() {
 		//重新遊戲
 		socket.on('new-game', playersData => {
 			setBlock('Game',playersData);
-			setBroadcastData({name:'new-game',data:playersData});
+			//setBroadcastData({name:'new-game',data:playersData});
 		});
 
 		//更新局數
@@ -92,8 +97,9 @@ export default function Home() {
 			setBlock('LoginFail')
 			setActiveBlock('LoginFail');
 		}else{
-			setBlock('Game',res)
-			setBroadcastData({name:'update-players',data:res});
+			setBlock('Game');
+			setBroadcastData({name:'login',data:res});
+			//setBroadcastData({name:'update-players',data:res.players});
 			socket.emit('update-players',res);
 		}
 	}
@@ -104,7 +110,7 @@ export default function Home() {
 
 	function setBlock(name,data) {
 		setActiveBlock(name);
-		if(name == 'Game'){
+		if(name == 'Game' && data){
 			setBroadcastData({name:'new-game',data:data});
 		}
 	}

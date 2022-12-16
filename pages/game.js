@@ -3,6 +3,7 @@ import pocker from "./pocker.module.scss";
 import PlayerMoney from "./playerMoney";
 import TotalMoney from "./totalMoney";
 import {useEffect, useState} from "react";
+import {updateDiamondMoney} from "../lib/redis_game";
 
 export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcastData,setBlock}) {
 	const [ myId, setMyId ] = useState(0);
@@ -14,6 +15,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	const defaultMyCards = [{"number":0,"type":"","imgName":"back"},{"number":0,"type":"","imgName":"back"}]
 	const [ myCards, setMyCard ] = useState(defaultMyCards);
 	const [ my3edCards, set3edCard ] = useState({});
+	const [ pay, setPay ] = useState(0);
 
 	const betsButtons = [10,30,50];
 	const [ inputBets, setInputBets ] = useState(0);
@@ -33,12 +35,13 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	const [ ttlNumber, setTtlNumber ] = useState(10);
 
 	const [ isOpenDiamondMode, setOpenDiamondMode] = useState(false);
-	const [ isDiamondMode, setDiamondMode ] = useState(false);
+	const [ diamondMoney, setDiamondMoney ] = useState(0);
+	const [ isDiamondOverlay, setDiamondOverlay ] = useState(false);
 	const [ playerCards, setPlayerCards ] = useState(defaultMyCards);
 	const [ player3edCard, setPlayer3edCard ] = useState({});
 	const [ diamondBets, setDiamondBets ] = useState(false);
 	const [ playersClickDiamondBets, setPlayersClickDiamondBets ] = useState({});
-	const [ shoot, setShoot ] = useState(isOpenDiamondMode? false:true);
+	const [ shoot, setShoot ] = useState(true);
 
 	async function dealCards(e) {
 		// 人物表情 Default
@@ -50,9 +53,10 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			method: "POST",
 			header: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				baseMyMoney: baseMyMoney,
+				//baseMyMoney: baseMyMoney,
 				baseMoney: baseMoney,
-				players: players
+				players: players,
+				totalMoney: totalMoney
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
@@ -60,6 +64,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		setMyCard(res.cards);
 		set3edCard({});
 		setPlayers(res.players);
+		calculateTotalMoney(res.players,diamondMoney);
 		broadcast('deal-cards',{players:res.players, cards:res.cards});
 		setDiamondModeDefault();
 	}
@@ -77,14 +82,18 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				myCards: myCards,
 				bets: bets,
 				bigOrSmall: bigOrSmall,
-				totalMoney: totalMoney
+				totalMoney: totalMoney,
+				isOpenDiamondMode:isOpenDiamondMode,
+				diamondMoney:diamondMoney,
+				diamondBets:playersClickDiamondBets,
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
 		set3edCard(res.my3edCards);
 		setPlayers(res.players);
-		broadcast('get-card',{players:res.players, card:res.my3edCards});
+		calculateTotalMoney(res.players,res.diamondMoney);
+		broadcast('get-card',{players:res.players, card:res.my3edCards, diamondMoney:res.diamondMoney});
 	}
 
 	async function nextPlayer(e) {
@@ -92,13 +101,20 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		const apiUrlEndpoint = `/api/setNextPlayer`;
 		const getData = {
 			method: "POST",
-			header: { "Content-Type": "application/json" }
+			header: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				diamondMode:isOpenDiamondMode,
+				myCards: myCards
+			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
 		broadcast('set-next-player',res);
-		setDefault(res);
-		setDiamondModeDefault();
+		setDefault(res.players);
+		calculateTotalMoney(res.players,res.diamondMoney);
+		if(isOpenDiamondMode){
+			setDiamondModeDefault();
+		}
 	}
 
 	async function onChangeInputBets(value) {
@@ -151,8 +167,11 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	}
 
 	async function newGame() {
+		// 人物表情 Default
+		setClickedGetCard(false);
 		const res = await getNewGameData();
-		setDefault(res)
+		setDefault(res);
+		calculateTotalMoney(res,0);
 		getGameNumber();
 		broadcast('new-game',res);
 	}
@@ -200,7 +219,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		return res;
 	}
 
-	async function updateRole(autoIncreNum,newPlayerId) {
+	function updateRole(autoIncreNum,newPlayerId) {
 		let newPlayers = []
 		players.forEach((player,index)=>{
 			if(player.autoIncreNum == autoIncreNum) {
@@ -223,6 +242,10 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		setPlayers(res);
 	}*/
 
+	function setTtlGameNumber(num) {
+		setTtlNumber(num);
+	}
+
 	async function clickOpenDiamondMode(value) {
 		setOpenDiamondMode(value);
 		broadcast('click-open-diamondMode',value);
@@ -237,10 +260,6 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
-	}
-
-	function setTtlGameNumber(num) {
-		setTtlNumber(num);
 	}
 
 	function clickDiamondBets(value) {
@@ -267,19 +286,44 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		setDiamondBets(false);
 	}
 
+	function calculateTotalMoney(players,diamondMoney){
+		let baseAllMoney = players.length * baseMyMoney;
+		let totalPlayersMoney = 0;
+		players.forEach((player)=>{
+			totalPlayersMoney += player.money;
+		});
+		setTotalMoney(baseAllMoney - totalPlayersMoney - diamondMoney);
+		setDiamondMoney(diamondMoney);
+	}
+
 	useEffect(()=>{
 		switch (broadcastData.name) {
+			//登入
+			case "login":
+				setPlayers(broadcastData.data.players);
+				setOpenDiamondMode(broadcastData.data.game.diamondMode);
+				calculateTotalMoney(broadcastData.data.players,broadcastData.data.game.diamondMoney);
+				break;
+
+			//登出
+			case "logout":
+				setDefault(broadcastData.data);
+				calculateTotalMoney(broadcastData.data,diamondMoney);
+				break;
+
 			// 更新all使用者
 			case "update-players":
-				setPlayers(broadcastData.data);
+				setPlayers(broadcastData.data.players);
+				calculateTotalMoney(broadcastData.data.players,broadcastData.data.game.diamondMoney);
 				break;
 
 			//pass
 			case "set-next-player":
-				setDefault(broadcastData.data);
-
+				setDefault(broadcastData.data.players);
+				calculateTotalMoney(broadcastData.data.players,broadcastData.data.diamondMoney);
 				if(isOpenDiamondMode){
-					setDiamondMode(false);
+					setDiamondOverlay(false);
+					//setDiamondMoney(broadcastData.data.diamondMoney);
 				}
 				break;
 
@@ -288,6 +332,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				// 人物表情 Default
 				setClickedGetCard(false);
 				setDefault(broadcastData.data);
+				calculateTotalMoney(broadcastData.data,0);
 				getGameNumber();
 				break;
 
@@ -301,9 +346,10 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			case "deal-cards":
 				setClickedGetCard(false);
 				setPlayers(broadcastData.data.players);
+				calculateTotalMoney(broadcastData.data.players,diamondMoney);
 
-				if(isOpenDiamondMode){
-					setDiamondMode(true);
+				if(isOpenDiamondMode && diamondMoney >= (players.length-1)*100){
+					setDiamondOverlay(true);
 					setPlayerCards(broadcastData.data.cards);
 					setDiamondModeDefault();
 				}
@@ -313,9 +359,10 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			case "get-card":
 				setClickedGetCard(true);
 				setDefault(broadcastData.data.players);
+				calculateTotalMoney(broadcastData.data.players,broadcastData.data.diamondMoney);
 
-				if(isOpenDiamondMode){
-					setDiamondMode(true);
+				if(isOpenDiamondMode && diamondMoney >= (players.length-1)*100){
+					setDiamondOverlay(true);
 					setPlayer3edCard(broadcastData.data.card);
 				}
 				break;
@@ -342,8 +389,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	},[broadcastData]);
 
 	useEffect(()=>{
-		let baseAllMoney = players.length * baseMyMoney;
-		let totalPlayersMoney = 0;
+		//let baseAllMoney = players.length * baseMyMoney;
+		//let totalPlayersMoney = 0;
 		let canPlay = false;
 		let someoneCantPlay = false;
 		players.forEach((player,index)=>{
@@ -355,7 +402,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				//有人沒錢了
 				someoneCantPlay = true;
 			}
-			totalPlayersMoney += player.money;
+			//totalPlayersMoney += player.money;
 			if(player.socketId == socketId){
 				setMyId(player);
 				setMyMoney(player.money);
@@ -364,7 +411,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 				setCurrentPlayer(player)
 			}
 		});
-		setTotalMoney(baseAllMoney - totalPlayersMoney);
+		//setTotalMoney(baseAllMoney - totalPlayersMoney - diamondMoney);
 		setIsAnyPlayerCanPlay(canPlay);
 		setIsAnyPlayerCantPlay(someoneCantPlay);
 	},[players]);
@@ -388,6 +435,20 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		}else{
 			setBigOrSmall('');
 		}
+
+		//有幾張能射門
+		const difference = myCards[0].number - myCards[1].number;
+		if(difference == 0) {
+			if(myCards[0].number > 7){
+				setPay((myCards[0].number - 1) * 10);
+			}else if(myCards[0].number < 7){
+				setPay((13 - myCards[0].number) * 10)
+			}else {
+				setPay(6 * 10)
+			}
+		}else{
+			setPay(difference * 10)
+		}
 	},[myCards]);
 
 	useEffect(()=>{
@@ -397,20 +458,41 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	},[totalMoney]);
 
 	useEffect(()=>{
-		if(!isDiamondMode){
-			setPlayerCards(defaultMyCards);
+		if(!isDiamondOverlay){
+			//setPlayerCards(defaultMyCards);
 			setDiamondModeDefault();
 		}
-	},[isDiamondMode]);
+	},[isDiamondOverlay]);
 
-	useEffect(()=>{
-		if(isOpenDiamondMode){
+	/*useEffect(()=>{
+		if(isOpenDiamondMode && diamondMoney >= (players.length-1)*100){
 			setShoot(false);
 			if(Object.keys(playersClickDiamondBets).length >= players.length - 1){
 				setShoot(true);
 			}
 		}
-	},[playersClickDiamondBets]);
+	},[playersClickDiamondBets]);*/
+
+	useEffect(()=>{
+		if(!isOpenDiamondMode){
+			setShoot(true);
+
+			//關閉 overlay
+			setDiamondOverlay(false);
+			calculateTotalMoney(players,0);
+		}
+	},[isOpenDiamondMode]);
+
+	useEffect(()=>{
+		if(diamondMoney >= (players.length-1)*100) {
+			setShoot(false);
+			if(Object.keys(playersClickDiamondBets).length >= players.length - 1){
+				setShoot(true);
+			}
+		}else{
+			setShoot(true);
+		}
+	},[diamondMoney, playersClickDiamondBets]);
 
 	let the3edCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || bets<=0 || totalMoney <=0 || !shoot}>射</button>
@@ -444,7 +526,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			            broadcast={broadcast}
 			            clickOpenDiamondMode={clickOpenDiamondMode}
 			            isOpenDiamondMode={isOpenDiamondMode}
-			            isDiamondMode={isDiamondMode}/>
+			            isDiamondOverlay={isDiamondOverlay}
+			            diamondMoney={diamondMoney}/>
 			<div className={styles.myGameBoard}>
 				<div className={styles.gameBoard}>
 					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
@@ -478,7 +561,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 					{theDealCardDev}
 				</div>
 			</div>
-			<div id={`${styles.menu}`} className={`${isDiamondMode? styles.active:''}`}>
+			<div id={`${styles.menu}`} className={`${isDiamondOverlay? styles.active:''}`}>
 				<ul className={styles.nav + ' ' + (isNavOpen? styles.active:'')}>
 					<li><button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gemeOver}>遊戲結束</button></li>
 					<li><button className={'btn '+'btn-red-outline '+styles.newGame} onClick={newGame}>重新遊戲</button></li>
@@ -503,7 +586,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 					</ul>
 				</div>
 			</div>
-			<div className={`${styles.overlay} ${isDiamondMode? styles.active:''}`} onClick={()=>setDiamondMode(player3edCard.imgName? false : true)}>
+			<div className={`${styles.overlay} ${isDiamondOverlay? styles.active:''}`} onClick={()=>setDiamondOverlay(player3edCard.imgName? false : true)}>
 				<div className={`${styles.diamondGameBoard}`}>
 					<div className={styles.gameBoard}>
 						<div className={`${styles.card1} ${pocker['bg-'+playerCards[0].imgName]}`}></div>

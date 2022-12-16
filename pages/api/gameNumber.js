@@ -2,10 +2,6 @@ import { countGame, createGame, getGame, updateTtlGameNum } from "../../lib/redi
 
 export default async function handler(req, res) {
 	try {
-		const isCreateGame = await countGame();
-		if(isCreateGame == 0){
-			await createGame();
-		}
 		if(req.method == 'POST'){
 			const num = JSON.parse(req.body).ttlGameNumber;
 			await updateTtlGameNum(num);
