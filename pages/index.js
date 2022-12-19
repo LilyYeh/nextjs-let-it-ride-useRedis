@@ -12,8 +12,8 @@ export default function Home() {
 	const [ activeBlock, setActiveBlock ] = useState('');
 	const [ broadcastData, setBroadcastData ] = useState({name:"",data:[]});
 
-	const baseMoney = 10;
-	const baseMyMoney = 1000;
+	const baseMoney = 30;
+	const baseMyMoney = 2000;
 
 	async function socketInitializer() {
 		await fetch('/api/socket');

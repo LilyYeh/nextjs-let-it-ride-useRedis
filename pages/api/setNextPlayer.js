@@ -6,25 +6,12 @@ import {updateDiamondMoney,getGame} from "../../lib/redis_game";
 export default async function handler(req, res) {
 	try {
 		const cookieId = await getCookie('cookieId', { req, res });
-		const myCards = JSON.parse(req.body).myCards;
 		const diamondMode = JSON.parse(req.body).diamondMode;
 		const myMoney = JSON.parse(req.body).myMoney;
+		const baseMoney = JSON.parse(req.body).baseMoney;
+		const pay = JSON.parse(req.body).payPass;
 		let diamondMoney = 0;
-		if(diamondMode && myMoney > 20){
-			//有幾張能射門
-			const difference = myCards[0].number - myCards[1].number;
-			let pay = 0;
-			if(difference == 0) {
-				if(myCards[0].number > 7){
-					pay = (myCards[0].number - 1) * 10;
-				}else if(myCards[0].number < 7){
-					pay = (13 - myCards[0].number) * 10;
-				}else {
-					pay = 6 * 10;
-				}
-			}else{
-				pay = difference * 10;
-			}
+		if(diamondMode && myMoney > baseMoney){
 			await updatePlayer({cookieId:cookieId,pay:(-1 * pay)});
 			await updateDiamondMoney('add',pay);
 			const game = await getGame();

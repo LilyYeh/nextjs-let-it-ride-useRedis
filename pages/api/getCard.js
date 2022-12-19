@@ -1,7 +1,8 @@
 import { getCookie } from 'cookies-next';
 import {countCards, createCards, foldCards, getCards} from "../../lib/redis_cards";
 import {goaling, setNextPlayer, updatePlayer} from "../../lib/redis_player";
-import {getGame, updateDiamondMoney, updateGameNumber} from "../../lib/redis_game";
+import {updateDiamondMoney, updateGameNumber} from "../../lib/redis_game";
+import {diamondPay} from "../diamondPay";
 
 /*
  * return 一張撲克牌
@@ -60,49 +61,24 @@ export default async function handler(req, res) {
 		const isOpenDiamondMode = JSON.parse(req.body).isOpenDiamondMode;
 		const diamondBets = JSON.parse(req.body).diamondBets;
 		let diamondMoney = JSON.parse(req.body).diamondMoney;
-		if(isOpenDiamondMode && diamondMoney >= (players.length-1)*100){
-			const difference = myCards[0].number - myCards[1].number - 1;
+		let diamondBaseMoney = JSON.parse(req.body).diamondBaseMoney;
+		if(isOpenDiamondMode && diamondMoney >= (players.length-1)*diamondBaseMoney){
 			players.forEach((player,index)=>{
 				if(!diamondBets[player.autoIncreNum]) return;
 
-				let pay = 0;
+				let ttlPay = 0;
 				if(diamondBets[player.autoIncreNum].diamondBets == 1 && bets > 0){ //會中
-					if(difference == -1){
-						if(myCards[0].number > 9 ){
-							pay = (13 - myCards[0].number + 1) * 10;
-						}else if(myCards[0].number < 5){
-							pay = myCards[0].number * 10;
-						}else {
-							pay = 5 * 10;
-						}
-					}else if(difference >= 10){
-						pay = 10;
-					}else{
-						pay = (11 - difference) * 10;
-					}
+					ttlPay = diamondPay(diamondMoney,players,diamondBets[player.autoIncreNum].diamondBets,myCards);
 				}else if(diamondBets[player.autoIncreNum].diamondBets == 2 && bets < 0){ //不會中
-					if(difference == -1){
-						if(myCards[0].number > 7 ){
-							pay = (myCards[0].number - 3) * 10;
-						}else if(myCards[0].number < 7){
-							pay = (13 - myCards[0].number - 2) * 10;
-						}else {
-							pay = 5 * 10;
-						}
-					}else if(difference <= 2){
-						pay = 10;
-					}else{
-						pay = (difference - 1) * 10;
-					}
+					ttlPay = diamondPay(diamondMoney,players,diamondBets[player.autoIncreNum].diamondBets,myCards);
 				}
+				diamondMoney -= ttlPay;
+				updateDiamondMoney('minus',ttlPay);
 
-				diamondMoney -= pay;
-				updateDiamondMoney('minus',pay);
-
-				players[index].money += pay;
+				players[index].money += ttlPay;
 				updatePlayer({
 					cookieId: player.cookieId,
-					pay: pay
+					pay: ttlPay
 				});
 			});
 		}
