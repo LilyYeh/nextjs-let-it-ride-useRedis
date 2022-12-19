@@ -34,13 +34,13 @@ export default function handler(req, res) {
 		});
 
 		//遊戲結束
-		socket.on('game-over', rankingData => {
-			socket.broadcast.emit('game-over', rankingData);
+		socket.on('game-over', data => {
+			socket.broadcast.emit('game-over', data);
 		});
 
 		//重新遊戲
-		socket.on('new-game',  playersData => {
-			socket.broadcast.emit('new-game', playersData);
+		socket.on('new-game',  data => {
+			socket.broadcast.emit('new-game', data);
 		});
 
 		//更新局數

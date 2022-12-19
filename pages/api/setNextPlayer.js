@@ -8,8 +8,9 @@ export default async function handler(req, res) {
 		const cookieId = await getCookie('cookieId', { req, res });
 		const myCards = JSON.parse(req.body).myCards;
 		const diamondMode = JSON.parse(req.body).diamondMode;
+		const myMoney = JSON.parse(req.body).myMoney;
 		let diamondMoney = 0;
-		if(diamondMode){
+		if(diamondMode && myMoney > 20){
 			//有幾張能射門
 			const difference = myCards[0].number - myCards[1].number;
 			let pay = 0;

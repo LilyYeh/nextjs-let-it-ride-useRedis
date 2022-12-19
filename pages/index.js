@@ -39,13 +39,13 @@ export default function Home() {
 		});
 
 		//遊戲結束
-		socket.on('game-over', rankingData => {
-			setBlock('GameOver');
+		socket.on('game-over', data => {
+			setBlock('GameOver',data);
 		});
 
 		//重新遊戲
-		socket.on('new-game', playersData => {
-			setBlock('Game',playersData);
+		socket.on('new-game', data => {
+			setBlock('Game',data);
 			//setBroadcastData({name:'new-game',data:playersData});
 		});
 
@@ -99,7 +99,6 @@ export default function Home() {
 		}else{
 			setBlock('Game');
 			setBroadcastData({name:'login',data:res});
-			//setBroadcastData({name:'update-players',data:res.players});
 			socket.emit('update-players',res);
 		}
 	}
@@ -112,6 +111,8 @@ export default function Home() {
 		setActiveBlock(name);
 		if(name == 'Game' && data){
 			setBroadcastData({name:'new-game',data:data});
+		}else if(name == 'GameOver' && data){
+			setBroadcastData({name:'game-over',data:data});
 		}
 	}
 
@@ -148,6 +149,7 @@ export default function Home() {
 					baseMoney={baseMoney}
 					baseMyMoney={baseMyMoney}
 					broadcast={broadcast}
+					broadcastData={broadcastData}
 					setBlock={setBlock}
 				/>:null}
 				{activeBlock == 'LoginFail'? <GameLoginFail/>:null}

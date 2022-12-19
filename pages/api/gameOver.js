@@ -1,4 +1,5 @@
 import { getAllPlayers, setNextPlayer } from "../../lib/redis_player";
+import {getGame} from "../../lib/redis_game";
 
 export default async function handler(req, res) {
 	try {
@@ -11,9 +12,10 @@ export default async function handler(req, res) {
 			}
 		})
 
+		const game = await getGame();
 		await setNextPlayer();
 
-		res.status(200).json(players);
+		res.status(200).json({players:players, game:game});
 	}catch (error) {
 		res.status(500).json({ error:error.message });
 	}

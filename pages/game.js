@@ -104,7 +104,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			header: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				diamondMode:isOpenDiamondMode,
-				myCards: myCards
+				myCards: myCards,
+				myMoney: myMoney
 			})
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
@@ -167,13 +168,16 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	}
 
 	async function newGame() {
+		const res = await getNewGameData();
+		broadcast('new-game',res);
+
 		// 人物表情 Default
 		setClickedGetCard(false);
-		const res = await getNewGameData();
-		setDefault(res);
-		calculateTotalMoney(res,0);
-		getGameNumber();
-		broadcast('new-game',res);
+		setDefault(res.players);
+		setNumber(res.game.number);
+		setTtlNumber(res.game.ttl);
+		setOpenDiamondMode(res.game.diamondMode);
+		calculateTotalMoney(res.players,0);
 	}
 
 	async function getNewGameData() {
@@ -191,9 +195,18 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		return res;
 	}
 
-	function gemeOver() {
-		broadcast('game-over',[]);
-		setBlock("GameOver");
+	async function gemeOver() {
+		const apiUrlEndpoint = `/api/gameOver`;
+		const getData = {
+			method: "POST",
+			header: { "Content-Type": "application/json" },
+			body: JSON.stringify({})
+		}
+		const response = await fetch(apiUrlEndpoint, getData);
+		const res = await response.json();
+		
+		broadcast('game-over',res);
+		setBlock("GameOver",res);
 	}
 
 	function setDefault(playersData) {
@@ -230,17 +243,6 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 
 		setPlayers(newPlayers);
 	}
-
-	/*async function getPlayers() {
-		const apiUrlEndpoint = `/api/getPlayers`;
-		const getData = {
-			method: "GET",
-			header: { "Content-Type": "application/json" }
-		}
-		const response = await fetch(apiUrlEndpoint, getData);
-		const res = await response.json();
-		setPlayers(res);
-	}*/
 
 	function setTtlGameNumber(num) {
 		setTtlNumber(num);
@@ -331,9 +333,11 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			case "new-game":
 				// 人物表情 Default
 				setClickedGetCard(false);
-				setDefault(broadcastData.data);
-				calculateTotalMoney(broadcastData.data,0);
-				getGameNumber();
+				setDefault(broadcastData.data.players);
+				setNumber(broadcastData.data.game.number);
+				setTtlNumber(broadcastData.data.game.ttl);
+				setOpenDiamondMode(broadcastData.data.game.diamondMode);
+				calculateTotalMoney(broadcastData.data.players,0);
 				break;
 
 			//更新局數
@@ -463,15 +467,6 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 			setDiamondModeDefault();
 		}
 	},[isDiamondOverlay]);
-
-	/*useEffect(()=>{
-		if(isOpenDiamondMode && diamondMoney >= (players.length-1)*100){
-			setShoot(false);
-			if(Object.keys(playersClickDiamondBets).length >= players.length - 1){
-				setShoot(true);
-			}
-		}
-	},[playersClickDiamondBets]);*/
 
 	useEffect(()=>{
 		if(!isOpenDiamondMode){
