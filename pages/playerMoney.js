@@ -59,7 +59,7 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 	return (
 		<>
 			<li className={`${style} ${currentPlayer.autoIncreNum==playerData.autoIncreNum? styles.me : ''} ${socketId==playerData.socketId? styles.isMe : ''}`} onClick={changeRole}>
-				<div className={styles.icon}><img src={"/images/otherMoney.png"} className={styles.otherMoney}/>
+				<div className={styles.icon}>
 					<img src={"/images/privateMoney.png"} className={styles.privateMoney}/>
 					<label className={`${styles.playerDiamondBets} ${diamondBetsTag? (diamondBetsTag==1? styles.goal : styles.fail) : ''}`}>{diamondBetsTag? diamondBetsValue[diamondBetsTag]:''}</label>
 				</div>
