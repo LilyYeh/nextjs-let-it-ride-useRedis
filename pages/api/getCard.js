@@ -62,7 +62,8 @@ export default async function handler(req, res) {
 		//diamondMode
 		const isOpenDiamondMode = JSON.parse(req.body).isOpenDiamondMode;
 		const diamondBets = JSON.parse(req.body).diamondBets;
-		let diamondMoney = JSON.parse(req.body).diamondMoney;
+		const diamondMoney = JSON.parse(req.body).diamondMoney;
+		let myDiamondMoney = diamondMoney
 		let diamondBaseMoney = JSON.parse(req.body).diamondBaseMoney;
 		if(isOpenDiamondMode && diamondMoney >= (players.length-1)*diamondBaseMoney){
 			players.forEach((player,index)=>{
@@ -74,8 +75,7 @@ export default async function handler(req, res) {
 				}else if(diamondBets[player.autoIncreNum].diamondBets == 2 && bets < 0){ //不會中
 					ttlPay = diamondPay(diamondMoney,players,diamondBets[player.autoIncreNum].diamondBets,myCards);
 				}
-				diamondMoney -= ttlPay;
-				updateDiamondMoney('minus',ttlPay);
+				myDiamondMoney -= ttlPay;
 
 				players[index].money += ttlPay;
 				updatePlayer({
@@ -83,9 +83,10 @@ export default async function handler(req, res) {
 					pay: ttlPay
 				});
 			});
+			await updateDiamondMoney('value',myDiamondMoney);
 		}
 
-		res.status(200).json({my3edCards: my3edCards, players: players, gameNumber:gameNumber, diamondMoney: diamondMoney});
+		res.status(200).json({my3edCards: my3edCards, players: players, gameNumber:gameNumber, diamondMoney: myDiamondMoney});
 	} catch (error) {
 		res.status(500).json({ error:error.message });
 	}

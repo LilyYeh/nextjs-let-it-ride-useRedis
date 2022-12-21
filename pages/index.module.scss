@@ -648,7 +648,7 @@ button.win {
 	}
 
 	.privateMoneyWrapper {
-		padding: 0.5rem;
+		padding: 0.6rem;
 		padding-bottom: 0;
 		margin: auto;
 		overflow-x: scroll;
@@ -658,8 +658,8 @@ button.win {
 			li {
 				display: inline-block;
 				padding: 0.5rem 1.5rem 0rem 5.2rem;
-				min-width: 4.5rem;
-				height: 4.5rem;
+				min-width: 5rem;
+				height: 4.8rem;
 				text-align: left;
 				font-size: 2rem;
 				font-weight: bold;
@@ -725,6 +725,19 @@ button.win {
 					color: #dc3545;
 					cursor: pointer;
 					order: 1;
+					&:after {
+						content: "";
+						position: absolute;
+						top: -0.4rem;
+						left: -0.5rem;
+						width: 5.5rem;
+						height: 5.5rem;
+						border: 1px solid #dddddded;
+						border-radius: 50%;
+						box-shadow: 0rem 0rem 0.1rem rgb(0 0 0 / 30%);
+						background: white;
+						z-index: 0;
+					}
 				}
 				&:before {
 					content: "";
@@ -733,6 +746,7 @@ button.win {
 					left: 0;
 					width: 5rem;
 					height: 5rem;
+					z-index: 1;
 				}
 				&.king:before {
 					background: url(/images/players/king.svg) no-repeat;
@@ -821,8 +835,9 @@ button.win {
 				}
 				&.prince2-lose:before {
 					background: url(/images/players/prince2-lose.svg) no-repeat;
-					background-size: 4.1rem auto;
-					left: 0.5rem;
+					background-size: 4rem auto;
+					top: 0.3rem;
+					left: 0.3rem;
 				}
 			}
 		}

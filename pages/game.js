@@ -8,7 +8,7 @@ import {passPay,diamondPay} from "./diamondPay";
 
 export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcastData,setBlock}) {
 	const [ myId, setMyId ] = useState(0);
-	const [ players, setPlayers ] = useState([]);
+	const [ players, setPlayers ] = useImmer([]);
 	const [ currentPlayer, setCurrentPlayer ] = useState({});
 	const [ isMyTurn, setMyTurn ] = useState(false);
 
@@ -225,17 +225,12 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	}
 	// 換角色
 	function updateRole(autoIncreNum,newPlayerId) {
-		const newPlayers = players.map(player => {
-			if (player.autoIncreNum == autoIncreNum) {
-				return {
-					...player,
-					playerId: newPlayerId,
-				};
-			} else {
-				return player;
-			}
+		setPlayers(draft => {
+			const player = draft.find(p =>
+				p.autoIncreNum == autoIncreNum
+			);
+			player.playerId = newPlayerId;
 		});
-		setPlayers(newPlayers);
 	}
 	// 設定總局數
 	function setTtlGameNumber(num) {
@@ -266,8 +261,8 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	}
 	// 賭會射中or不會射中(儲存點選資料)
 	function resetPlayersDiamondBetsData(data) {
-		setPlayersClickDiamondBets({
-			[data.player.autoIncreNum]:data
+		setPlayersClickDiamondBets(draft => {
+			draft[data.player.autoIncreNum] = data
 		});
 	}
 	// 初始狀態(Diamond Mode)
@@ -409,6 +404,9 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	// 當前玩家&我的資料 → 判斷是否輪到我了。
 	useEffect(()=>{
 		if(currentPlayer.autoIncreNum == myId.autoIncreNum){
+			if(!player3edCard.imgName){
+				setDiamondOverlay(false);
+			}
 			setMyTurn(true);
 		}else{
 			setMyTurn(false);
