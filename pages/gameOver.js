@@ -57,13 +57,8 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 
 	},[players]);
 
+	// 重新遊戲
 	async function newGame() {
-		const res = await getNewGameData();
-		broadcast('new-game',res);
-		setBlock("Game",res);
-	}
-
-	async function getNewGameData() {
 		const apiUrlEndpoint = `/api/newGame`;
 		const getData = {
 			method: "POST",
@@ -75,7 +70,8 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 		}
 		const response = await fetch(apiUrlEndpoint, getData);
 		const res = await response.json();
-		return res;
+		broadcast('new-game',res);
+		setBlock("Game",res);
 	}
 
 	async function clickOpenDiamondMode(value) {

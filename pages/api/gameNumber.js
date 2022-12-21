@@ -1,4 +1,4 @@
-import { countGame, createGame, getGame, updateTtlGameNum } from "../../lib/redis_game";
+import { getGame, updateTtlGameNum } from "../../lib/redis_game";
 
 export default async function handler(req, res) {
 	try {

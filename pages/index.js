@@ -60,8 +60,8 @@ export default function Home() {
 		});
 
 		//射
-		socket.on('get-card', getCardFlag => {
-			setBroadcastData({name:'get-card',data:getCardFlag});
+		socket.on('get-card', data => {
+			setBroadcastData({name:'get-card',data:data});
 		});
 
 		//換角色

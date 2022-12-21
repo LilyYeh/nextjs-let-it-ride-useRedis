@@ -673,9 +673,7 @@ button.win {
 					display: flex;
 					align-items: center;
 					font-size: 1.6rem;
-					margin-top: -0.5rem;
 					margin-bottom: 0.2rem;
-					margin-left: -1rem;
 					height: 2rem;
 					img {
 						height: 2rem;
@@ -800,12 +798,14 @@ button.win {
 				}
 				&.prince-win:before {
 					background: url(/images/players/prince-win.svg) no-repeat;
-					background-size: 5.3rem auto;
+					background-size: 5.5rem auto;
 					width: 5.5rem;
+					top: -0.3rem;
+					left: -0.3rem;
 				}
 				&.prince-lose:before {
 					background: url(/images/players/prince-lose.svg) no-repeat;
-					background-size: 4rem auto;
+					background-size: 4.2rem auto;
 					left: 0.5rem;
 				}
 				&.prince2:before {

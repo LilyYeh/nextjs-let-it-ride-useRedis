@@ -49,10 +49,12 @@ export default async function handler(req, res) {
 		// 棄牌
 		await foldCards(cookieId);
 
-		// 檯面上沒錢了(add 局數)？
+		// 檯面上沒錢了(局數+1)？
 		const totalMoney = JSON.parse(req.body).totalMoney;
+		let gameNumber = JSON.parse(req.body).gameNumber;
 		if(totalMoney - bets <=0) {
 			await updateGameNumber();
+			gameNumber += 1;
 		}
 
 		let players = await setNextPlayer();
@@ -83,7 +85,7 @@ export default async function handler(req, res) {
 			});
 		}
 
-		res.status(200).json({my3edCards: my3edCards, players: players, diamondMoney: diamondMoney});
+		res.status(200).json({my3edCards: my3edCards, players: players, gameNumber:gameNumber, diamondMoney: diamondMoney});
 	} catch (error) {
 		res.status(500).json({ error:error.message });
 	}
