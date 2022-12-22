@@ -648,196 +648,135 @@ button.win {
 	}
 
 	.privateMoneyWrapper {
-		padding: 0.6rem;
+		//padding: 0.6rem;
 		padding-bottom: 0;
+		padding-left: 0.2rem;
 		margin: auto;
 		overflow-x: scroll;
 		overflow-y: hidden;
 		ul.privateMoney {
 			display: flex;
 			li {
-				display: inline-block;
-				padding: 0.5rem 1.5rem 0rem 5.2rem;
-				min-width: 5rem;
+				display: inline-flex;
+				padding: 1rem 0.5rem 0rem 0;
+				min-width: 11.5rem;
 				height: 4.8rem;
 				text-align: left;
 				font-size: 2rem;
 				font-weight: bold;
-				position: relative;
+				//position: relative;
 				-webkit-user-select:none;
 				-moz-user-select:none;
 				-o-user-select:none;
 				user-select:none;
 				order: 2;
-				.icon {
-					display: flex;
-					align-items: center;
-					font-size: 1.6rem;
-					margin-bottom: 0.2rem;
-					height: 2rem;
-					img {
+				.info{
+					.icon {
+						display: flex;
+						align-items: center;
+						font-size: 1.6rem;
+						margin-bottom: 0.2rem;
 						height: 2rem;
-						z-index: 1;
-					}
-					img.otherMoney {
-						display: block;
-					}
-					img.privateMoney {
-						display: none;
-						height: 1.6rem;
-						margin: 0.2rem;
-					}
-					label.playerDiamondBets{
-						&.goal, &.fail {
-							font-size: 12px;
-							border-radius: 0.2rem;
-							padding: 0.2rem 0;
-							text-align: center;
-							color: white;
+						img {
+							height: 2rem;
+							z-index: 1;
 						}
-						&.goal {
-							background: #dc3545;
-							min-width: 3rem;
+						img.otherMoney {
+							display: block;
 						}
-						&.fail {
-							background: #000000;
-							min-width: 4rem;
+						img.privateMoney {
+							display: none;
+							height: 1.6rem;
+							margin: 0.2rem;
+						}
+						label.playerDiamondBets{
+							&.goal, &.fail {
+								font-size: 12px;
+								border-radius: 0.2rem;
+								padding: 0.2rem 0;
+								text-align: center;
+								color: white;
+							}
+							&.goal {
+								background: #dc3545;
+								min-width: 3rem;
+							}
+							&.fail {
+								background: #000000;
+								min-width: 4rem;
+							}
 						}
 					}
-				}
-				.myMoney {
-					img {
-						height: 2rem;
-						margin-right: 0.1rem;
+					.myMoney {
+						img {
+							height: 2rem;
+							margin-right: 0.1rem;
+						}
 					}
 				}
 				&.me {
-					.icon {
-						img.otherMoney {
-							display: none;
-						}
-						img.privateMoney {
-							display: block;
+					.info{
+						.icon {
+							img.otherMoney {
+								display: none;
+							}
+							img.privateMoney {
+								display: block;
+							}
 						}
 					}
 				}
 				&.isMe {
 					color: #dc3545;
-					cursor: pointer;
 					order: 1;
-					&:after {
-						content: "";
-						position: absolute;
-						top: -0.4rem;
-						left: -0.5rem;
-						width: 5.5rem;
-						height: 5.5rem;
-						border: 1px solid #dddddded;
-						border-radius: 50%;
-						box-shadow: 0rem 0rem 0.1rem rgb(0 0 0 / 30%);
-						background: white;
-						z-index: 0;
+					.role {
+						cursor: pointer;
 					}
 				}
-				&:before {
-					content: "";
-					position: absolute;
-					top: 0;
-					left: 0;
+				.roleName {
+					width: 12px;
+					font-size: 12px;
+				}
+				.role {
+					display: inline-flex;
+					align-items: center;
+					justify-content: right;
 					width: 5rem;
-					height: 5rem;
-					z-index: 1;
-				}
-				&.king:before {
-					background: url(/images/players/king.svg) no-repeat;
-					background-size: 4.8rem auto;
-				}
-				&.king-win:before {
-					background: url(/images/players/king-win.svg) no-repeat;
-					background-size: 5.1rem auto;
-					width: 5.3rem;
-				}
-				&.king-lose:before {
-					background: url(/images/players/king-lose.svg) no-repeat;
-					background-size: 4.8rem auto;
-					top: 0.5rem;
-				}
-				&.king2:before {
-					background: url(/images/players/king2.svg) no-repeat;
-					background-size: 4.6rem auto;
-				}
-				&.king2-win:before {
-					background: url(/images/players/king2-win.svg) no-repeat;
-					background-size: 5.3rem auto;
-					left: -0.4rem;
-					width: 5.5rem;
-				}
-				&.king2-lose:before {
-					background: url(/images/players/king2-lose.svg) no-repeat;
-					background-size: 5.3rem auto;
-					width: 5.5rem;
-				}
-				&.queen-flower:before {
-					background: url(/images/players/queen-flower.svg) no-repeat;
-					background-size: 4.8rem auto;
-				}
-				&.queen-flower-win:before {
-					background: url(/images/players/queen-flower-win.svg) no-repeat;
-					background-size: 4.8rem auto;
-				}
-				&.queen-flower-lose:before {
-					background: url(/images/players/queen-flower-lose.svg) no-repeat;
-					background-size: 5.8rem auto;
-					top: 0rem;
-					left: -0.5rem;
-					width: 6rem;
-				}
-				&.queen:before {
-					background: url(/images/players/queen.svg) no-repeat;
-					background-size: 4.8rem auto;
-				}
-				&.queen-win:before {
-					background: url(/images/players/queen-win.svg) no-repeat;
-					background-size: 4.8rem auto;
-					top: 0.3rem;
-				}
-				&.queen-lose:before {
-					background: url(/images/players/queen-lose.svg) no-repeat;
-					background-size: 4.8rem auto;
-					top: -0.3rem;
-				}
-				&.prince:before {
-					background: url(/images/players/prince.svg) no-repeat;
-					background-size: 4.8rem auto;
-				}
-				&.prince-win:before {
-					background: url(/images/players/prince-win.svg) no-repeat;
-					background-size: 5.5rem auto;
-					width: 5.5rem;
-					top: -0.3rem;
-					left: -0.3rem;
-				}
-				&.prince-lose:before {
-					background: url(/images/players/prince-lose.svg) no-repeat;
-					background-size: 4.2rem auto;
-					left: 0.5rem;
-				}
-				&.prince2:before {
-					background: url(/images/players/prince2.svg) no-repeat;
-					background-size: 3.9rem auto;
-					top: 0.3rem;
-					left: 0.5rem;
-				}
-				&.prince2-win:before {
-					background: url(/images/players/prince2-win.svg) no-repeat;
-					background-size: 5.3rem auto;
-					width: 5.5rem;
-				}
-				&.prince2-lose:before {
-					background: url(/images/players/prince2-lose.svg) no-repeat;
-					background-size: 4rem auto;
-					top: 0.3rem;
-					left: 0.3rem;
+					height: 4.5rem;
+					margin-right: 0.2rem;
+					img {
+						width: auto;
+						max-height: 100%;
+						z-index: 1;
+						&.king {
+							max-height: 110%;
+						}
+						&.king-win {}
+						&.king-lose {}
+						&.king2 {
+							margin-top: -0.3rem;
+							max-height: 95%;
+						}
+						&.king2-win {}
+						&.king2-lose {}
+						&.queen-flower {
+							margin-top: -0.3rem;
+							max-height: 95%;
+						}
+						&.queen-flower-win {}
+						&.queen-flower-lose {}
+						&.queen {}
+						&.queen-win {}
+						&.queen-lose {}
+						&.prince {}
+						&.prince-win {
+							margin-top: -0.3rem;
+						}
+						&.prince-lose {}
+						&.prince2 {}
+						&.prince2-win {}
+						&.prince2-lose {}
+					}
 				}
 			}
 		}

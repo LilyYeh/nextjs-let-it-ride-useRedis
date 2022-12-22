@@ -10,12 +10,14 @@ export default async function handler(req, res) {
 		const myMoney = JSON.parse(req.body).myMoney;
 		const baseMoney = JSON.parse(req.body).baseMoney;
 		const pay = JSON.parse(req.body).payPass;
-		let diamondMoney = 0;
+
+		const game = await getGame();
+		let diamondMoney = game.diamondMoney;
+
 		if(diamondMode && myMoney > baseMoney){
 			await updatePlayer({cookieId:cookieId,pay:(-1 * pay)});
 			await updateDiamondMoney('add',pay);
-			const game = await getGame();
-			diamondMoney = game.diamondMoney;
+			diamondMoney += pay;
 		}
 		await foldCards(cookieId);
 		let players = await setNextPlayer();

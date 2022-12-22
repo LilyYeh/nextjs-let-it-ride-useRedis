@@ -3,6 +3,7 @@ import useRate from "./useRate";
 import styles from "./index.module.scss";
 
 const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
+const players_name = ['茱蒂絲','大衛','奧吉爾','阿金妮','亞歷山大','拉海爾'];
 
 export default function playerMoney({socketId, playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole, broadcast, playersClickDiamondBets}) {
 	const [ money, setMoney ]=useState(playerData.money);
@@ -14,14 +15,14 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 	useEffect(() => {
 		if(getCardFlag){
 			if (playerData.money > money) {
-				setStyle(styles[players_img[playerData.playerId] + '-win']);
+				setStyle(players_img[playerData.playerId] + '-win');
 			} else if (playerData.money < money) {
-				setStyle(styles[players_img[playerData.playerId] + '-lose']);
+				setStyle(players_img[playerData.playerId] + '-lose');
 			} else {
-				setStyle(styles[players_img[playerData.playerId]]);
+				setStyle(players_img[playerData.playerId]);
 			}
 		}else{
-			setStyle(styles[players_img[playerData.playerId]]);
+			setStyle(players_img[playerData.playerId]);
 		}
 
 		setMoney(playerData.money);
@@ -35,7 +36,7 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 	},[playersClickDiamondBets]);
 
 	async function changeRole(e) {
-		if (e.currentTarget.classList.contains(styles['isMe'])) {
+		if (e.currentTarget.closest('li').classList.contains(styles['isMe'])) {
 			let newPlayerId = playerData.playerId;
 			while(newPlayerId == playerData.playerId) {
 				newPlayerId = await Math.floor(Math.random() * 6);
@@ -58,12 +59,18 @@ export default function playerMoney({socketId, playerData, currentPlayer, baseMy
 
 	return (
 		<>
-			<li className={`${style} ${currentPlayer.autoIncreNum==playerData.autoIncreNum? styles.me : ''} ${socketId==playerData.socketId? styles.isMe : ''}`} onClick={changeRole}>
-				<div className={styles.icon}>
-					<img src={"/images/privateMoney.png"} className={styles.privateMoney}/>
-					<label className={`${styles.playerDiamondBets} ${diamondBetsTag? (diamondBetsTag==1? styles.goal : styles.fail) : ''}`}>{diamondBetsTag? diamondBetsValue[diamondBetsTag]:''}</label>
+			<li className={`${currentPlayer.autoIncreNum==playerData.autoIncreNum? styles.me : ''} ${socketId==playerData.socketId? styles.isMe : ''}`}>
+				<span className={styles.roleName}>{players_name[playerData.playerId]}</span>
+				<div className={`${styles.role}`}>
+					<img className={`${styles[style]}`} src={`/images/players/${style}.svg`}  onClick={changeRole}/>
 				</div>
-				<span className={styles.myMoney}>{useRate(playerData.money, baseMyMoney)}</span>
+				<div className={styles.info}>
+					<div className={styles.icon}>
+						<img src={"/images/privateMoney.png"} className={styles.privateMoney}/>
+						<label className={`${styles.playerDiamondBets} ${diamondBetsTag? (diamondBetsTag==1? styles.goal : styles.fail) : ''}`}>{diamondBetsTag? diamondBetsValue[diamondBetsTag]:''}</label>
+					</div>
+					<span className={styles.myMoney}>{useRate(playerData.money, baseMyMoney)}</span>
+				</div>
 			</li>
 		</>
 	)

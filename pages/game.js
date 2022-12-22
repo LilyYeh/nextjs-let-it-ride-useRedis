@@ -8,14 +8,19 @@ import {passPay,diamondPay} from "./diamondPay";
 
 export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcastData,setBlock}) {
 	const [ myId, setMyId ] = useState(0);
+	const [ myMoney, setMyMoney ] = useState(baseMyMoney);
 	const [ players, setPlayers ] = useImmer([]);
 	const [ currentPlayer, setCurrentPlayer ] = useState({});
 	const [ isMyTurn, setMyTurn ] = useState(false);
+	const [ isAnyPlayerCanPlay, setIsAnyPlayerCanPlay ] = useState(false);
+	const [ isAnyPlayerCantPlay, setIsAnyPlayerCantPlay ] = useState(false);
+	const [ totalMoney, setTotalMoney ] = useState(0);
 
 	//myCards[0]、myCards[1] 龍柱
 	const defaultMyCards = [{"number":0,"type":"","imgName":"back"},{"number":0,"type":"","imgName":"back"}]
 	const [ myCards, setMyCard ] = useState(defaultMyCards);
 	const [ my3edCards, set3edCard ] = useState({});
+	const [ getCardFlag, setClickedGetCard ] = useState(false);
 
 	const betsButtons = [30,50,100];
 	const [ inputBets, setInputBets ] = useState(0);
@@ -23,12 +28,6 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 	const [ bets, setBets ] = useState(0);
 	const [ bigOrSmall, setBigOrSmall ] = useState('');
 
-	const [ myMoney, setMyMoney ] = useState(baseMyMoney);
-	const [ totalMoney, setTotalMoney ] = useState(0);
-	const [ isAnyPlayerCanPlay, setIsAnyPlayerCanPlay ] = useState(false);
-	const [ isAnyPlayerCantPlay, setIsAnyPlayerCantPlay ] = useState(false);
-
-	const [ getCardFlag, setClickedGetCard ] = useState(false);
 	const [ isNavOpen, setNavOpen ] = useState(false);
 
 	const [ gameNumber, setNumber ] = useState(0);
@@ -121,9 +120,7 @@ export default function game({socketId,baseMoney,baseMyMoney,broadcast,broadcast
 		broadcast('set-next-player',res);
 		setDefault(res.players);
 		calculateTotalMoney(res.players,res.diamondMoney);
-		if(isOpenDiamondMode){
-			setDiamondModeDefault();
-		}
+		setDiamondModeDefault();
 	}
 	// 下注(- +)
 	async function onChangeInputBets(value) {
