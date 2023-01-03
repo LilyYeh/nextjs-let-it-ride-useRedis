@@ -1,11 +1,16 @@
-import { useEffect, useState, useRef } from 'react';
-import useRate from "./useRate";
-import styles from "./index.module.scss";
+import {useEffect, useState, useRef, useContext} from 'react';
+import useRate from "../tools/useRate";
+import styles from "../index.module.scss";
+import BroadcastContext from "../context/ControlContext";
 
 const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 const players_name = ['茱蒂絲','大衛','奧吉爾','阿金妮','亞歷山大','拉海爾'];
 
-export default function playerMoney({socketId, playerData, currentPlayer, baseMyMoney, getCardFlag, updateRole, broadcast, playersClickDiamondBets}) {
+export default function playerMoney({socketId, playerData, currentPlayer, getCardFlag, updateRole, playersClickDiamondBets}) {
+	const props = useContext(BroadcastContext);
+	const baseMyMoney = props.baseMyMoney;
+	const broadcast = props.broadcast;
+
 	const [ money, setMoney ]=useState(playerData.money);
 	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
 

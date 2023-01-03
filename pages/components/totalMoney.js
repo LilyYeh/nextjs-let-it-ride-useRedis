@@ -1,8 +1,14 @@
-import styles from "./index.module.scss";
-import useRate from "./useRate";
-import {useEffect, useState, useRef} from "react";
+import styles from "../index.module.scss";
+import useRate from "../tools/useRate";
+import {useEffect, useState, useRef, useContext} from "react";
+import BroadcastContext from "../context/ControlContext";
 
-export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumber,broadcast,clickOpenDiamondMode,isOpenDiamondMode,setDiamondOverlay,diamondMoney}) {
+export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumber,clickOpenDiamondMode,isOpenDiamondMode,setDiamondOverlay,diamondMoney}) {
+	const props = useContext(BroadcastContext);
+	const broadcast = props.broadcast;
+
+	const [rate,setRate]=useState(0);
+
 	const [ isGameSettingOpen, setGameSettingOpen ] = useState(false);
 	const [ isOverlayOpen, setOverlayOpen ] = useState(false);
 	const mounted=useRef();
@@ -64,6 +70,25 @@ export default function totalMoney({ttlMoney,gameNumber,ttlNumber,setTtlGameNumb
 	if(!isOpenDiamondMode){
 		mydev = <>開啟</>;
 	}
+
+	/*useEffect(()=>{
+		let tm;
+		tm = setInterval(()=>{
+			setRate(count => {
+				console.log(ttlMoney,count);
+				if(ttlMoney > count){
+					return count + 1;
+				}else if(ttlMoney < count){
+					return count - 1;
+				}else{
+					clearInterval(tm);
+					return count;
+				}
+			});
+		},20);
+
+		return() => clearInterval(tm);
+	},[ttlMoney]);*/
 
 	return (
 		<>

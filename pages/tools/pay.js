@@ -1,4 +1,6 @@
 export function passPay(myCards) {
+	if(myCards[0].number == 0) return 0;
+
 	//有幾張能射門
 	const difference = myCards[0].number - myCards[1].number;
 	if(difference == 0) {
@@ -14,7 +16,7 @@ export function passPay(myCards) {
 	}
 }
 
-export function diamondPay(diamondMoney,players,diamondBets,myCards) {
+export function diamondPay(diamondMoney, players, diamondBets, myCards) {
 	const difference = myCards[0].number - myCards[1].number - 1;
 
 	let pay = 0;

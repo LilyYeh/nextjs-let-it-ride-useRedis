@@ -1,19 +1,29 @@
 import styles from "./index.module.scss";
-import TotalMoney from "./totalMoney";
-import PlayerRanking from "./playerRanking";
-import {useEffect, useState} from "react";
+import TotalMoney from "./components/totalMoney";
+import PlayerRanking from "./components/playerRanking";
+import {useContext, useEffect, useMemo, useState} from "react";
+import BroadcastContext from './context/ControlContext';
 
-export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,setBlock}) {
+export default function gameOver() {
+	const props = useContext(BroadcastContext);
+	const baseMoney = props.baseMoney;
+	const baseMyMoney = props.baseMyMoney;
+	const broadcast = props.broadcast;
+	const broadcastData = props.broadcastData;
+	const setBlock = props.setBlock;
+
 	const [ players, setPlayers ] = useState([]);
-	const [ totalMoney, setTotalMoney ] = useState(0);
-	const [ minPrivateMoney, setMinPrivateMoney ] = useState(0);
-	const [ maxPrivateMoney, setMaxPrivateMoney ] = useState(0);
 
 	const [ gameNumber, setNumber ] = useState(0);
 	const [ ttlNumber, setTtlNumber ] = useState(10);
 
 	const [ isOpenDiamondMode, setOpenDiamondMode] = useState(false);
 	const [ diamondMoney, setDiamondMoney ] = useState(0);
+
+	// 計算總金額
+	const totalMoney = useMemo(() => calculateTotalMoney(players,diamondMoney) ,[players,diamondMoney]);
+	const loser = useMemo(() => setWinnerAndLoser(players) ,[players]).loser;
+	const winner = useMemo(() => setWinnerAndLoser(players) ,[players]).winner;
 
 	useEffect(()=>{
 		switch (broadcastData.name) {
@@ -22,40 +32,13 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 				setNumber(broadcastData.data.game.number);
 				setTtlNumber(broadcastData.data.game.ttl);
 				setOpenDiamondMode(broadcastData.data.game.diamondMode);
-				calculateTotalMoney(broadcastData.data.players,broadcastData.data.game.diamondMoney);
+				setDiamondMoney(broadcastData.data.game.diamondMoney);
 				break;
 
 			default:
 				break;
 		}
 	},[broadcastData]);
-
-	useEffect(()=>{
-		let minMoney = 9999;
-		let maxMoney = 0;
-		let minMoneyPlayer = 0;
-		let maxMoneyPlayer = 0;
-		players.forEach((player,index)=>{
-			//剩餘錢最少的玩家
-			if(player.money < minMoney){
-				minMoney = player.money;
-				minMoneyPlayer = player.autoIncreNum;
-			}
-			//剩餘錢最多的玩家
-			if(player.money > maxMoney){
-				maxMoney = player.money;
-				maxMoneyPlayer = player.autoIncreNum;
-			}
-		});
-		if(maxMoney > minMoney) {
-			setMinPrivateMoney(minMoneyPlayer);
-			setMaxPrivateMoney(maxMoneyPlayer);
-		}else{
-			setMinPrivateMoney(0);
-			setMaxPrivateMoney(0);
-		}
-
-	},[players]);
 
 	// 重新遊戲
 	async function newGame() {
@@ -96,8 +79,31 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 		players.forEach((player)=>{
 			totalPlayersMoney += player.money;
 		});
-		setTotalMoney(baseAllMoney - totalPlayersMoney - diamondMoney);
-		setDiamondMoney(diamondMoney);
+		return baseAllMoney - totalPlayersMoney - diamondMoney;
+	}
+
+	function setWinnerAndLoser(players){
+		let minMoney = 9999;
+		let maxMoney = 0;
+		let minMoneyPlayer = 0;
+		let maxMoneyPlayer = 0;
+		players.forEach((player,index)=>{
+			//剩餘錢最少的玩家
+			if(player.money < minMoney){
+				minMoney = player.money;
+				minMoneyPlayer = player.autoIncreNum;
+			}
+			//剩餘錢最多的玩家
+			if(player.money > maxMoney){
+				maxMoney = player.money;
+				maxMoneyPlayer = player.autoIncreNum;
+			}
+		});
+
+		if(maxMoney > minMoney) {
+			return {winner:maxMoneyPlayer, loser:minMoneyPlayer};
+		}
+		return {winner:0, loser:0};
 	}
 
 	return (
@@ -105,7 +111,6 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 			<TotalMoney ttlMoney={totalMoney}
 			            gameNumber={gameNumber}
 			            ttlNumber={ttlNumber}
-			            broadcast={broadcast}
 			            clickOpenDiamondMode={clickOpenDiamondMode}
 			            isOpenDiamondMode={isOpenDiamondMode}
 			            diamondMoney={diamondMoney}/>
@@ -124,9 +129,8 @@ export default function gameOver({baseMoney,baseMyMoney,broadcast,broadcastData,
 						return (<PlayerRanking key={index}
 						                       ranking={index+1}
 						                       playerData={rank}
-						                       baseMyMoney={baseMyMoney}
-						                       minPrivateMoney={minPrivateMoney}
-						                       maxPrivateMoney={maxPrivateMoney}
+						                       loser={loser}
+						                       winner={winner}
 						/>)
 					})
 				}

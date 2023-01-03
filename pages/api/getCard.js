@@ -2,7 +2,7 @@ import { getCookie } from 'cookies-next';
 import {countCards, createCards, foldCards, getCards} from "../../lib/redis_cards";
 import {goaling, setNextPlayer, updatePlayer} from "../../lib/redis_player";
 import {updateDiamondMoney, updateGameNumber} from "../../lib/redis_game";
-import {diamondPay} from "../diamondPay";
+import {diamondPay} from "../tools/pay";
 
 /*
  * return 一張撲克牌

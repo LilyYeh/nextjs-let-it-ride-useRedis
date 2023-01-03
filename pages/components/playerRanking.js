@@ -1,13 +1,17 @@
-import styles from "./index.module.scss";
+import {useContext} from "react";
+import BroadcastContext from "../context/ControlContext";
 
 const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
 
-export default function playerRanking({ranking, playerData, baseMyMoney, minPrivateMoney, maxPrivateMoney}) {
+export default function playerRanking({ranking, playerData, loser, winner}) {
+	const props = useContext(BroadcastContext);
+	const baseMyMoney = props.baseMyMoney;
+
 	let playerName = players_img[playerData.playerId];
-	if(minPrivateMoney == playerData.autoIncreNum){
+	if(loser == playerData.autoIncreNum){
 		playerName = players_img[playerData.playerId]+'-lose';
 	}
-	if(maxPrivateMoney == playerData.autoIncreNum){
+	if(winner == playerData.autoIncreNum){
 		playerName = players_img[playerData.playerId]+'-win';
 	}
 
