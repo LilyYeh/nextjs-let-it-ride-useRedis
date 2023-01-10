@@ -247,11 +247,16 @@
 	background-size: cover;
 	.gameBoard{
 		.card3 {
-			margin: 0 1.7rem;
+			margin: 0 0.2rem;
+			width: 13rem;
+			border: 1.2px solid #000;
 			&.active {
 				margin: 0 0.3rem;
+				width: 13.2rem;
+				border: none;
 			}
 		}
+
 	}
 }
 
@@ -830,11 +835,33 @@ table.gameOver {
 @media screen and (min-width: 377px) {
 	.diamondGameBoard {
 		margin: 12rem auto 1rem;
+		.gameBoard{
+			.card3 {
+				margin: 0 1rem;
+				width: 10.5rem;
+				height: 10.5rem;
+				border: 1.2px solid #000;
+				background-size: 14.7rem auto;
+				&.active {
+					margin: 0 1rem;
+					width: 10.5rem;
+					height: 10.8rem;
+					border: none;
+					background-size: auto auto;
+				}
+			}
+		}
 	}
 
 	.gameBoard {
 		.card1, .card2, .card3 {
 			margin: 0 0.5rem;
+		}
+		.card1, .card2 {
+			:not(.bg-back) {
+				width: 10.5rem;
+				height: 10.8rem;
+			}
 		}
 	}
 
@@ -873,16 +900,80 @@ table.gameOver {
 		max-width: 100%;
 	}
 
-	.card3 {
-		width: 5.5rem;
+	.diamondGameBoard {
+		margin: 9.5rem auto 1rem;
+		padding: 1rem 0rem;
+		.gameBoard{
+			.card1, .card2 {
+				margin: 0;
+				width: 10rem;
+				&.active {
+					margin: 0;
+				}
+			}
+			.card3 {
+				margin: 0 0.1rem;
+				width: 10rem;
+				height: 10.5rem;
+				background-size: 14.5rem auto;
+				&.active {
+					margin: 0;
+					width: 10rem;
+					height: auto;
+					background-size: auto;
+				}
+			}
+		}
+	}
+	.diamondPayHint {
+		margin-bottom: 1rem;
+	}
+	.closeModalHint {
+		img {
+			animation-name: clickHint;
+			animation-duration: 2s;
+			animation-iteration-count: infinite;
+			animation-timing-function: ease;
+		}
+	}
+	@keyframes clickHint {
+		0%   {
+			top: -0.3rem;
+			right: 3.5rem;
+			opacity: 0.3;
+		}
+		50%  {
+			top: -0.6rem;
+			right: 3.8rem;
+			opacity: 1;
+		}
+		100% {
+			top: -0.3rem;
+			right: 3.5rem;
+			opacity: 0.3;
+		}
+	}
+
+	.gameBoard {
+		.card1, .card2, .card3 {
+			&.active{
+				margin: 0rem;
+				width: 7.7rem;
+			}
+		}
+		.card3 {
+			width: 6rem;
+		}
 	}
 
 	.bets {
 		margin: 0 0.4rem 0.5rem;
+		text-align: center;
+		padding: 1rem 0;
 		.coin {
-			width: 3rem;
-			height: 3rem;
-			line-height: 3rem;
+			width: 3.5rem;
+			height: 3.5rem;
+			line-height: 3.5rem;
 		}
 		.inputCoin {
 			input {

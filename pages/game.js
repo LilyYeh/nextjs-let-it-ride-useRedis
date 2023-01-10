@@ -479,12 +479,6 @@ export default function game({socketId}) {
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>;
 	}
 
-	const players_img = ['queen','king','prince2','queen-flower','king2','prince'];
-	let player3edCardDev = <img src={`/images/players/${players_img[currentPlayer.playerId]}.svg`} />;
-	if(player3edCard.imgName) {
-		player3edCardDev = '';
-	}
-
 	return (
 		<>
 			<TotalMoney ttlMoney={totalMoney}
@@ -497,9 +491,9 @@ export default function game({socketId}) {
 			            diamondMoney={diamondMoney}/>
 			<div className={styles.myGameBoard}>
 				<div className={styles.gameBoard}>
-					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
-					<div className={`${styles.card3} ${my3edCards.imgName ? pocker['bg-'+my3edCards.imgName] : ''}`}>{the3edCardDev}</div>
-					<div className={`${styles.card2} ${pocker['bg-'+myCards[1].imgName]}`}></div>
+					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]} ${my3edCards.imgName ? styles.active : ''}`}></div>
+					<div className={`${styles.card3} ${my3edCards.imgName ? pocker['bg-'+my3edCards.imgName]+' '+styles.active : ''}`}>{the3edCardDev}</div>
+					<div className={`${styles.card2} ${pocker['bg-'+myCards[1].imgName]} ${my3edCards.imgName ? styles.active : ''}`}></div>
 				</div>
 				<div className={styles.bets+(myCards[0].number? " "+styles.active : "")}>
 					<label className={styles.title}>下注</label>
@@ -555,7 +549,7 @@ export default function game({socketId}) {
 				<div className={`${styles.diamondGameBoard}`}>
 					<div className={styles.gameBoard}>
 						<div className={`${styles.card1} ${pocker['bg-'+playerCards[0].imgName]}`}></div>
-						<div className={`${styles.card3} ${player3edCard.imgName ? pocker['bg-'+player3edCard.imgName]+' '+styles.active : ''}`}>{player3edCardDev}</div>
+						<div className={`${styles.card3} ${player3edCard.imgName ? pocker['bg-'+player3edCard.imgName]+' '+styles.active : pocker['bg-back']}`}></div>
 						<div className={`${styles.card2} ${pocker['bg-'+playerCards[1].imgName]}`}></div>
 					</div>
 				</div>

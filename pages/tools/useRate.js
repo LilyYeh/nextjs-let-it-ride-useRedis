@@ -3,8 +3,8 @@ import { useEffect, useState, useRef } from 'react';
 export default function useRate(value, defaultRate=0) {
 	const [rate,setRate]=useState(0);
 	const mounted=useRef();
-	const tm=useRef();
-	const tmTwo=useRef();
+	const tm=useRef();    //使用 let tm 也可以
+	const tmTwo=useRef(); //使用 let tmTwo 也可以
 
 	useEffect(()=>{
 		if(!mounted.current){ //componentDidMount

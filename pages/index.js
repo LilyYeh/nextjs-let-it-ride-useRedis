@@ -22,6 +22,7 @@ export default function Home() {
 
 		socket.on('connect', () => {
 			setSocketId(socket.id);
+			playerLogin(socket.id);
 		});
 
 		//登出
@@ -81,7 +82,7 @@ export default function Home() {
 		});
 	}
 
-	async function playerLogin() {
+	async function playerLogin(socketId) {
 		const apiUrlEndpoint = `/api/playerLogin`;
 		const getData = {
 			method: "POST",
@@ -120,15 +121,6 @@ export default function Home() {
 	useEffect(()=>{
 		socketInitializer();
 	},[]);
-
-	useEffect(()=>{
-		async function f(){
-			if(socketId!==''){
-				await playerLogin();
-			}
-		}
-		f();
-	},[socketId]);
 
 	return (
 		<>
