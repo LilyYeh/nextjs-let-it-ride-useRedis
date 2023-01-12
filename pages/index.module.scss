@@ -230,118 +230,6 @@
 	}
 }
 
-.myGameBoard, .diamondGameBoard {
-	max-width: 376px;
-	min-height: calc(100vh - 11rem);
-	margin: 0 auto;
-}
-
-.diamondGameBoard {
-	height: auto;
-	margin: 12rem 1rem 1rem;
-	padding: 1rem 0.2rem;
-	min-height: unset;
-	background: white;
-	border-radius: 0.4rem;
-	background: url(/images/background-transparent.jpg);
-	background-size: cover;
-	.gameBoard{
-		.card3 {
-			margin: 0 0.2rem;
-			width: 13rem;
-			border: 1.2px solid #000;
-			&.active {
-				margin: 0 0.3rem;
-				width: 13.2rem;
-				border: none;
-			}
-		}
-
-	}
-}
-
-@-webkit-keyframes  shineRed {
-	from { -webkit-box-shadow: 0 0 5px #bbb; }
-	50% { -webkit-box-shadow: 0 0 10px red; }
-	to { -webkit-box-shadow: 0 0 5px #bbb; }
-}
-.diamondBets {
-	max-width: 376px;
-	margin: auto;
-	text-align: center;
-	margin-bottom: 1rem;
-	button.lose, button.win {
-		margin: 0 1rem;
-		&.active {
-			-webkit-box-shadow: 0 0 1.2rem white;
-			border: 1px solid white;
-			/*-webkit-animation-name: shineRed;
-			-webkit-animation-duration: 3s;
-			-webkit-animation-iteration-count: infinite;*/
-		}
-	}
-	button.win {
-		color: white;
-		background: #dc3545;
-	}
-	button.lose {
-		color: white;
-		background: #000000;
-	}
-}
-
-.closeModalHint, .diamondPayHint {
-	max-width: 376px;
-	margin: auto;
-	text-align: center;
-	font-size: 1rem;
-	color: white;
-	opacity: 0.8;
-	position: relative;
-	visibility: hidden;
-	&.active {
-		visibility: visible;
-	}
-	img {
-		position: absolute;
-		top: -0.8rem;
-		right: 5rem;
-		width: 2.5rem;
-	}
-}
-.closeModalHint {
-	img {
-		animation-name: clickHint;
-		animation-duration: 2s;
-		animation-iteration-count: infinite;
-		animation-timing-function: ease;
-	}
-}
-@keyframes clickHint {
-	0%   {
-		top: -0.3rem;
-		right: 5rem;
-		opacity: 0.3;
-	}
-	50%  {
-		top: -0.6rem;
-		right: 5.3rem;
-		opacity: 1;
-	}
-	100% {
-		top: -0.3rem;
-		right: 5rem;
-		opacity: 0.3;
-	}
-}
-.diamondPayHint {
-	margin-bottom: 3rem;
-	img {
-		position: static;
-		width: 1.3rem;
-	}
-}
-
 button.deal, button.shoot, button.pass, button.keepGoing, button.endGame, button.newGame, button.lose, button.win {
 	position: relative;
 	padding-left: 2rem;
@@ -449,26 +337,201 @@ button.win {
 	}
 }
 
-.gameBoard {
-	display: flex;
-	margin: 0 auto 0.5rem;
-	.card1, .card2, .card3 {
-		display:inline-block;
-		margin: 0 0.3rem;
-		font-size: 4rem;
-		font-weight: bold;
-		text-align: center;
-		img {
-			width: 100%;
-			height: auto;
+.myGameBoard {
+	max-width: 376px;
+	min-height: calc(100vh - 9rem);
+	margin: 0 auto;
+	.gameBoard {
+		display: flex;
+		margin: 0 auto 0.5rem;
+		.cardWrapper {
+			display:inline-block;
+			margin: 0 0.35rem;
+			width: 13.2rem; height: 10.8rem;
+			position: relative;
+			transform-style: preserve-3d; /* 3D效果 */
+			transition: 1s ease;
+			.card1, .card2, .card3 {
+				display: block;
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				backface-visibility: hidden;
+			}
+			img.clickHint {
+				visibility: hidden;
+			}
+		}
+		&:not(.flipped) {
+			margin: 0 auto 2rem;
+			.cardWrapper {
+				width: 11.5rem;
+				height: 10.6rem;
+				transform: rotateY(180deg); /* 繞著Y軸旋轉 */
+			}
+		}
+		&.flipped {
+			.cardWrapper {
+				&:not(.flipped) {
+					transform: rotateY(180deg); /* 繞著Y軸旋轉 */
+					height: 10.6rem;
+					margin: 0 0.35rem 0 0.5rem;
+					img.clickHint {
+						&.active {
+							visibility: visible;
+							width: 4rem;
+							position: absolute;
+							top: 4.7rem;
+							left: 0.3rem;
+							opacity: 0.3;
+							transform: rotateY(180deg);
+							animation-name: clickHint2;
+							animation-duration: 2s;
+							animation-iteration-count: infinite;
+							animation-timing-function: ease;
+						}
+					}
+					@keyframes clickHint2 {
+						0%   {
+							opacity: 1;
+						}
+						15%  {
+							top: 4.2rem;
+							left: 0.5rem;
+							opacity: 1;
+						}
+						25%   {
+							top: 4.2rem;
+							left: 0.5rem;
+							opacity: 0.3;
+						}
+						75%  {
+							top: 4.2rem;
+							left: 0.5rem;
+							opacity: 1;
+						}
+						100% {
+							opacity: 0;
+						}
+					}
+				}
+			}
 		}
 	}
 
-	.card3 {
-		border: 1px;
+	.bets {
+		//width: max-content;
+		margin: 0 auto 0.5rem;
+		background: white;
+		border: 1px solid rgba(16, 16, 16, 0.3);
+		border-radius: 8px;
+		padding: 1rem;
+		display: none;
+		&.active {
+			display: block;
+		}
+
+		.title {
+			display: block;
+			width: 100%;
+			margin-bottom: 0.5rem;
+			text-align: center;
+			font-size: 1.6rem;
+			font-weight: bold;
+		}
+
+		.bigOrSmallArea {
+			width: 100%;
+			margin-bottom: 0.5rem;
+			display: none;
+			&.active {
+				display: block;
+			}
+			.inputRadio {
+				margin-right: 1rem;
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				font-size: 1.5rem;
+				input[type=radio] {
+					height: 2rem;
+					width: 2rem;
+					margin-right: 0.5rem;
+					accent-color: #dc3545;
+				}
+			}
+		}
+
+		.coin {
+			display: inline-flex;
+			width: 3.5rem;
+			height: 3.5rem;
+			justify-content: center;
+			line-height: 3.5rem;
+			border: 2px solid #ffc107;
+			border-radius: 50%;
+			margin: 0 0.1rem;
+			cursor: pointer;
+			background: white;
+			color: #ffc107;
+			font-size: 1.4rem;
+			&.active {
+				/*background-image: linear-gradient(to left, #BDBBBE 0%, #9D9EA3 100%), radial-gradient(88% 271%, rgba(255, 255, 255, 0.25) 0%, rgba(254, 254, 254, 0.25) 1%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(50% 100%, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
+				background-blend-mode: normal, lighten, soft-light;
+				border: 2px solid grey;*/
+				background: #ffc107;
+				color:white;
+			}
+			&.disabled {
+				background: rgba(16, 16, 16, 0.03);
+				color: rgba(16, 16, 16, 0.12);
+				border: 2px solid rgba(16, 16, 16, 0.05);
+			}
+		}
+
+		.inputCoin {
+			display: inline-flex;
+			align-items: center;
+			border: 1px solid #000;
+			border-radius: 24px;
+			margin: 0 0.3rem;
+			input {
+				width: 3.9rem;
+				font-size: 1.5rem;
+				text-align: center;
+				border: 0px;
+			}
+			&.active {
+				background: #ffc107;
+				color:white;
+				input {
+					color: #000;
+					background: #ffc107;
+				}
+			}
+			.plus, .minus {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #000000;
+				font-weight: bold;
+				width: 3rem;
+				height: 3rem;
+				border: 0px;
+				background: transparent;
+				border-radius: 50%;
+				font-size: 1.5rem;
+			}
+		}
+	}
+
+	.dealCards {
+		margin: auto;
+		width: max-content;
 		.passPay {
 			&.active {
 				display: block;
+				text-align: center;
 			}
 			display: none;
 			font-size: 1rem;
@@ -481,121 +544,6 @@ button.win {
 			}
 		}
 	}
-
-	.getCard3 {
-		cursor: pointer;
-	}
-}
-
-.bets {
-	//width: max-content;
-	margin: 0 auto 0.5rem;
-	background: white;
-	border: 1px solid rgba(16, 16, 16, 0.3);
-	border-radius: 8px;
-	padding: 1rem;
-	display: none;
-	&.active {
-		display: block;
-	}
-
-	.title {
-		display: block;
-		width: 100%;
-		margin-bottom: 0.5rem;
-		text-align: center;
-		font-size: 1.6rem;
-		font-weight: bold;
-	}
-
-	.bigOrSmallArea {
-		width: 100%;
-		margin-bottom: 0.5rem;
-		display: none;
-		&.active {
-			display: block;
-		}
-		.inputRadio {
-			margin-right: 1rem;
-			cursor: pointer;
-			display: inline-flex;
-			align-items: center;
-			font-size: 1.5rem;
-			input[type=radio] {
-				height: 2rem;
-				width: 2rem;
-				margin-right: 0.5rem;
-				accent-color: #dc3545;
-			}
-		}
-	}
-
-	.coin {
-		display: inline-flex;
-		width: 3.5rem;
-		height: 3.5rem;
-		justify-content: center;
-		line-height: 3.5rem;
-		border: 2px solid #ffc107;
-		border-radius: 50%;
-		margin: 0 0.1rem;
-		cursor: pointer;
-		background: white;
-		color: #ffc107;
-		font-size: 1.4rem;
-		&.active {
-			/*background-image: linear-gradient(to left, #BDBBBE 0%, #9D9EA3 100%), radial-gradient(88% 271%, rgba(255, 255, 255, 0.25) 0%, rgba(254, 254, 254, 0.25) 1%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(50% 100%, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
-			background-blend-mode: normal, lighten, soft-light;
-			border: 2px solid grey;*/
-			background: #ffc107;
-			color:white;
-		}
-		&.disabled {
-			background: rgba(16, 16, 16, 0.03);
-			color: rgba(16, 16, 16, 0.12);
-			border: 2px solid rgba(16, 16, 16, 0.05);
-		}
-	}
-
-	.inputCoin {
-		display: inline-flex;
-		align-items: center;
-		border: 1px solid #000;
-		border-radius: 24px;
-		margin: 0 0.3rem;
-		input {
-			width: 3.9rem;
-			font-size: 1.5rem;
-			text-align: center;
-			border: 0px;
-		}
-		&.active {
-			background: #ffc107;
-			color:white;
-			input {
-				color: #000;
-				background: #ffc107;
-			}
-		}
-		.plus, .minus {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: #000000;
-			font-weight: bold;
-			width: 3rem;
-			height: 3rem;
-			border: 0px;
-			background: transparent;
-			border-radius: 50%;
-			font-size: 1.5rem;
-		}
-	}
-}
-
-.dealCards {
-	margin: auto;
-	width: max-content;
 }
 
 #menu {
@@ -734,6 +682,16 @@ button.win {
 				&.isMe {
 					color: #dc3545;
 					order: 1;
+					&:before {
+						content: "";
+						background: url(/images/me.svg) no-repeat;
+						background-size: 2rem;
+						width: 2rem;
+						height: 2rem;
+						position: absolute;
+						top: -1rem;
+						left: 2.5rem;
+					}
 					.role {
 						cursor: pointer;
 					}
@@ -756,10 +714,13 @@ button.win {
 						&.king {
 							max-height: 110%;
 						}
-						&.king-win {}
+						&.king-win {
+							margin-right: -0.2rem;
+						}
 						&.king-lose {}
 						&.king2 {
 							margin-top: -0.3rem;
+							margin-right: 0.2rem;
 							max-height: 95%;
 						}
 						&.king2-win {}
@@ -777,10 +738,16 @@ button.win {
 						&.prince-win {
 							margin-top: -0.3rem;
 						}
-						&.prince-lose {}
-						&.prince2 {}
+						&.prince-lose {
+							margin-right: 0.5rem;
+						}
+						&.prince2 {
+							margin-right: 0.5rem;
+						}
 						&.prince2-win {}
-						&.prince2-lose {}
+						&.prince2-lose {
+							margin-right: 0.5rem;
+						}
 					}
 				}
 			}
@@ -832,35 +799,136 @@ table.gameOver {
 	font-size: 1.4rem;
 }
 
-@media screen and (min-width: 377px) {
-	.diamondGameBoard {
-		margin: 12rem auto 1rem;
-		.gameBoard{
-			.card3 {
-				margin: 0 1rem;
-				width: 10.5rem;
-				height: 10.5rem;
-				border: 1.2px solid #000;
-				background-size: 14.7rem auto;
-				&.active {
-					margin: 0 1rem;
-					width: 10.5rem;
-					height: 10.8rem;
-					border: none;
-					background-size: auto auto;
-				}
+.diamondGameBoard {
+	max-width: 376px;
+	min-height: unset;
+	height: auto;
+	margin: 11rem 1rem 1rem;
+	padding: 1rem 0.2rem;
+	background: white;
+	border-radius: 0.4rem;
+	background: url(/images/background-transparent.jpg);
+	background-size: cover;
+	.gameBoard{
+		display: flex;
+		.card3 {
+			margin: 0 0.8rem 0 0.6rem;
+			width: 13.4rem;
+			border: 1.2px solid #000;
+			&.active {
+				margin: 0 0.9rem;
+				width: 13.2rem;
+				border: none;
 			}
 		}
 	}
+}
 
-	.gameBoard {
-		.card1, .card2, .card3 {
-			margin: 0 0.5rem;
+@-webkit-keyframes  shineRed {
+	from { -webkit-box-shadow: 0 0 5px #bbb; }
+	50% { -webkit-box-shadow: 0 0 10px red; }
+	to { -webkit-box-shadow: 0 0 5px #bbb; }
+}
+.diamondBets {
+	max-width: 376px;
+	margin: auto;
+	text-align: center;
+	margin-bottom: 1rem;
+	button.lose, button.win {
+		margin: 0 1rem;
+		&.active {
+			-webkit-box-shadow: 0 0 1.2rem white;
+			border: 1px solid white;
+			/*-webkit-animation-name: shineRed;
+			-webkit-animation-duration: 3s;
+			-webkit-animation-iteration-count: infinite;*/
 		}
-		.card1, .card2 {
-			:not(.bg-back) {
-				width: 10.5rem;
-				height: 10.8rem;
+	}
+	button.win {
+		color: white;
+		background: #dc3545;
+	}
+	button.lose {
+		color: white;
+		background: #000000;
+	}
+}
+
+.closeModalHint, .diamondPayHint {
+	max-width: 376px;
+	margin: auto;
+	text-align: center;
+	font-size: 1rem;
+	color: white;
+	opacity: 0.8;
+	position: relative;
+	visibility: hidden;
+	&.active {
+		visibility: visible;
+	}
+	img {
+		position: absolute;
+		top: -0.8rem;
+		right: 5rem;
+		width: 2.5rem;
+	}
+}
+.closeModalHint {
+	img {
+		animation-name: clickHint;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: ease;
+	}
+}
+@keyframes clickHint {
+	0%   {
+		top: -0.3rem;
+		right: 5rem;
+		opacity: 0.3;
+	}
+	50%  {
+		top: -0.6rem;
+		right: 5.3rem;
+		opacity: 1;
+	}
+	100% {
+		top: -0.3rem;
+		right: 5rem;
+		opacity: 0.3;
+	}
+}
+.diamondPayHint {
+	margin-bottom: 3rem;
+	img {
+		position: static;
+		width: 1.3rem;
+	}
+}
+
+@media screen and (min-width: 377px) {
+	.topColumn {
+		max-width: 376px;
+	}
+
+	.myGameBoard {
+		.gameBoard {
+			.cardWrapper {
+				margin: 0 0.7rem;
+			}
+			&:not(.flipped) {
+				.cardWrapper {
+					width: 7.5rem;
+					height: 10.4rem;
+				}
+			}
+			&.flipped {
+				.cardWrapper {
+					&:not(.flipped) {
+						width: 12.8rem;
+						height: 10.4rem;
+					}
+				}
 			}
 		}
 	}
@@ -881,6 +949,17 @@ table.gameOver {
 
 		.privateMoneyWrapper {
 			width: 376px;
+			ul.privateMoney {
+				li {
+					&.isMe {
+						&:before {
+							position: absolute;
+							top: -1rem;
+							left: calc((100% - 376px)/2 + 2.4rem);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -889,8 +968,24 @@ table.gameOver {
 		margin: 0 auto 3rem;
 	}
 
-	.topColumn {
-		max-width: 376px;
+	.diamondGameBoard {
+		margin: 11rem auto 1rem;
+		.gameBoard{
+			.card1 {
+				margin-left: 1rem;
+			}
+			.card3 {
+				margin: 0 1rem 0 0;
+				width: 11.8rem;
+				//height: 10.6rem;
+				border: 1.2px solid #000;
+				background-size: 14.7rem auto;
+				&.active {
+					border: none;
+					background-size: auto auto;
+				}
+			}
+		}
 	}
 }
 
@@ -898,6 +993,84 @@ table.gameOver {
 	.mainContent {
 		padding: 1rem 0;
 		max-width: 100%;
+	}
+
+	.topColumn{
+		.playNum {
+			.title {
+				.gameSetting {
+					margin-right: 0.2rem;
+				}
+			}
+		}
+		.publicMoney {
+			width: 8rem;
+			font-size: 2rem;
+			line-height: 2.8rem;
+			img {
+				height: 2.8rem;
+			}
+		}
+		.otherMoney {
+			width: 4.6rem;
+			font-size: 2rem;
+			line-height: 2rem;
+			margin-left: 0.2rem;
+			img {
+				height: 2rem;
+			}
+			&.disabled {
+				width: 4.6rem;
+				line-height: 2rem;
+			}
+		}
+	}
+
+	.myGameBoard {
+		.gameBoard {
+			.cardWrapper {
+				margin: 0 0.2rem;
+			}
+			&:not(.flipped) {
+				.cardWrapper {
+					width: 7.5rem;
+					height: 10.5rem;
+				}
+			}
+			&.flipped {
+				.cardWrapper {
+					margin: 0;
+					&:not(.flipped) {
+						width: 12.5rem;
+						height: 10.5rem;
+						margin: 0 0.2rem 0 0.4rem;
+					}
+				}
+			}
+		}
+
+		.bets {
+			margin: 0 0.4rem 0.5rem;
+			text-align: center;
+			padding: 1rem 0;
+			.coin {
+				width: 3.5rem;
+				height: 3.5rem;
+				line-height: 3.5rem;
+			}
+			.inputCoin {
+				input {
+					width: 3.6rem;
+				}
+				.plus, .minus {
+					width: 2.5rem;
+				}
+			}
+		}
+	}
+
+	#menu {
+		width: 100%;
 	}
 
 	.diamondGameBoard {
@@ -952,51 +1125,5 @@ table.gameOver {
 			right: 3.5rem;
 			opacity: 0.3;
 		}
-	}
-
-	.gameBoard {
-		.card1, .card2, .card3 {
-			&.active{
-				margin: 0rem;
-				width: 7.7rem;
-			}
-		}
-		.card3 {
-			width: 6rem;
-		}
-	}
-
-	.bets {
-		margin: 0 0.4rem 0.5rem;
-		text-align: center;
-		padding: 1rem 0;
-		.coin {
-			width: 3.5rem;
-			height: 3.5rem;
-			line-height: 3.5rem;
-		}
-		.inputCoin {
-			input {
-				width: 3.6rem;
-			}
-			.plus, .minus {
-				width: 2.5rem;
-			}
-		}
-	}
-
-	.topColumn{
-		.otherMoney, .publicMoney {
-			width: 8rem;
-			font-size: 2rem;
-			line-height: 2.8rem;
-			img {
-				height: 2.8rem;
-			}
-		}
-	}
-
-	#menu {
-		width: 100%;
 	}
 }

@@ -15,7 +15,7 @@ export default function playerMoney({socketId, playerData, currentPlayer, getCar
 	const [ style, setStyle ]=useState(styles[players_img[playerData.playerId]]);
 
 	const diamondBetsValue = {1:'會射中',2:'不會射中'};
-	const [ diamondBetsTag, setDiamondBetsTag] = useState(0);
+	const [ diamondBetsTag, setDiamondBetsTag ] = useState(0);
 
 	useEffect(() => {
 		if(getCardFlag){

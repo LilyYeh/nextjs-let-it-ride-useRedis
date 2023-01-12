@@ -260,10 +260,11 @@
 
 .bg-back {
 	width: 12rem;
-	height: 10.4rem;
+	height: 10.6rem;
 	background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
-	background-size: 14.6rem auto;
+	background-size: 14.8rem auto;
 	border: 0.1rem solid;
+	transform: rotateY(180deg);/*繞著Y軸旋轉*/
 }
 
 .bg-jocker_1 {
@@ -278,10 +279,10 @@
 
 @media screen and (min-width: 377px) {
 	.bg-back {
-		width: 13rem;
-		height: 11.1rem;
+		width: 11.8rem;
+		height: 10.6rem;
 		background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
-		background-size: 15.5rem auto;
+		background-size: 14.6rem auto;
 	}
 }
 
@@ -290,6 +291,6 @@
 		width: 7.3rem;
 		height: 10rem;
 		background: url(/images/pocker.png) -0.14rem -0.15rem no-repeat;
-		background-size: 14rem auto;
+		background-size: 13.8rem 12.4rem;
 	}
 }

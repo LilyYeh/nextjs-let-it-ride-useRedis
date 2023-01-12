@@ -26,12 +26,15 @@ export default function game({socketId}) {
 	const defaultMyCards = [{"number":0,"type":"","imgName":"back"},{"number":0,"type":"","imgName":"back"}]
 	const [ myCards, setMyCard ] = useState(defaultMyCards);
 	const [ my3edCards, set3edCard ] = useState({});
+	const [ isMyCardsFlipped, setMyCardsFlipped ] = useState(false);
+	const [ isMy3edCardsFlipped, setMy3edCardsFlipped ] = useState(false);
 	const [ getCardFlag, setClickedGetCard ] = useState(false);
 
 	const betsButtons = [30,50,100];
 	const [ inputBets, setInputBets ] = useState(0);
 	const [ buttonBets, setButtonBets ] = useState(0);
 	const [ bets, setBets ] = useState(0);
+	const [ bigOrSmall, setBigOrSmall ] = useState('');
 
 	const [ isNavOpen, setNavOpen ] = useState(false);
 
@@ -50,21 +53,27 @@ export default function game({socketId}) {
 
 	// 輪到我了？
 	const isMyTurn = useMemo(() => setMyTurn(currentPlayer,myId),[currentPlayer,myId]);
-	// 下注(比大比小)
-	const bigOrSmall = useMemo(() => setBigOrSmall(myCards) ,[myCards]);
 	// 計算 pass 賠$
 	const payPass = useMemo(() => passPay(myCards) ,[myCards]);
 	// 計算獲得 Diamond money 的$
 	const payShoot = useMemo(() => setPayShoot(playerCards) ,[playerCards]);
 	// 計算總金額
 	const totalMoney = useMemo(() => calculateTotalMoney(players,diamondMoney) ,[players,diamondMoney]);
+	// 可以射？
+	const canShoot = useMemo(() => {
+		if(!isMyTurn || !myCards[0].number || totalMoney <=0 || bets<=0 || !shoot){
+			return false;
+		}
+		return true;
+	} ,[isMyTurn, myCards[0].number, totalMoney, bets, shoot]);
 
 	// 重新發牌
 	async function dealCards(e) {
+		e.target.disabled = true;
+
 		// 人物表情 Default
 		setClickedGetCard(false);
 
-		e.target.disabled = true;
 		const apiUrlEndpoint = `/api/dealCards`;
 		const getData = {
 			method: "POST",
@@ -86,10 +95,12 @@ export default function game({socketId}) {
 	}
 	// 射
 	async function getCard(e) {
+		if(!canShoot) return;
+
 		// 人物表情變換
 		setClickedGetCard(true);
 
-		e.target.disabled = true;
+		setShoot(false);
 		const apiUrlEndpoint = `/api/getCard`;
 		const getData = {
 			method: "POST",
@@ -113,10 +124,12 @@ export default function game({socketId}) {
 		setNumber(res.gameNumber);
 		setDiamondMoney(res.diamondMoney);
 		broadcast('get-card',res);
+		setShoot(true);
 	}
 	// pass
 	async function nextPlayer(e) {
 		e.target.disabled = true;
+
 		const apiUrlEndpoint = `/api/setNextPlayer`;
 		const getData = {
 			method: "POST",
@@ -141,17 +154,6 @@ export default function game({socketId}) {
 			return true;
 		}
 		return false;
-	}
-	// 下注(比大比小)
-	function setBigOrSmall(myCards){
-		if(myCards[0].number!==0 && myCards[0].number == myCards[1].number){
-			if(myCards[0].number >= 7){
-				return 'small';
-			}else{
-				return 'big';
-			}
-		}
-		return '';
 	}
 	// 下注(- +)
 	async function onChangeInputBets(value) {
@@ -242,9 +244,13 @@ export default function game({socketId}) {
 	}
 	// 初始狀態(主畫面)
 	function setDefault(playersData) {
+		//卡片翻背面
+		setMyCardsFlipped(false);
+		setTimeout(function() {
+			setMyCard(defaultMyCards);
+			set3edCard({});
+		}, 1000);
 		setPlayers(playersData);
-		setMyCard(defaultMyCards);
-		set3edCard({});
 		setBets(0);
 		setInputBets(0);
 		setButtonBets(0);
@@ -364,6 +370,8 @@ export default function game({socketId}) {
 
 			//重新發牌
 			case "deal-cards":
+				//卡片翻背面
+				setMyCardsFlipped(false);
 				setClickedGetCard(false);
 				setPlayers(broadcastData.data.players);
 				if(isOpenDiamondMode && diamondMoney >= (players.length-1)*diamondBaseMoney){
@@ -437,6 +445,22 @@ export default function game({socketId}) {
 			setDiamondOverlay(false);
 		}
 	},[isMyTurn]);
+	// 卡片翻正面、下注(比大比小)
+	useEffect(()=>{
+		if(myCards[0].number!==0){
+			setMyCardsFlipped(true);
+		}else{
+			setMyCardsFlipped(false);
+		}
+
+		if(myCards[0].number!==0 && myCards[0].number == myCards[1].number){
+			if(myCards[0].number >= 7){
+				setBigOrSmall('small');
+			}else{
+				setBigOrSmall('big')
+			}
+		}
+	}, [myCards]);
 	// 關閉 Diamond Overlay → 初始狀態(Diamond Mode)。
 	useEffect(()=>{
 		if(!isDiamondOverlay){
@@ -461,22 +485,24 @@ export default function game({socketId}) {
 		}
 	},[isOpenDiamondMode, diamondMoney, playersClickDiamondBets]);
 
-	let the3edCardDev = <>
+	/*let the3edCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || totalMoney <=0 || bets<=0 || !shoot}>射</button>
-		<button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={!isMyTurn || !myCards[0].number || totalMoney <=0}>pass</button>
 		<label className={`${styles.passPay} ${isOpenDiamondMode && payPass>0? styles.active:''}`}>賠 <span className={styles.money}><img src={"/images/otherMoney.png"}/>{payPass}</span></label>
 	</>;
 	if(my3edCards.imgName) {
 		the3edCardDev = '';
-	}
+	}*/
 
 	let theDealCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.deal} onClick={dealCards} disabled={!isMyTurn || myCards[0].number}>重新發牌</button>
 	</>
 	if(!isAnyPlayerCanPlay || (totalMoney <=0 && isAnyPlayerCantPlay) || gameNumber>=ttlNumber){
 		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.endGame} onClick={gemeOver}>遊戲結束</button>;
-	}else if(myMoney < baseMoney && isMyTurn){
-		theDealCardDev = <button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>;
+	}else if((myMoney < baseMoney || isMyCardsFlipped) && isMyTurn){
+		theDealCardDev = <>
+			<button className={'btn '+'btn-black-outline '+styles.pass} onClick={nextPlayer} disabled={false}>pass</button>
+			<label className={`${styles.passPay} ${isOpenDiamondMode && payPass>0? styles.active:''}`}>賠 <span className={styles.money}><img src={"/images/otherMoney.png"}/>{payPass}</span></label>
+		</>;
 	}
 
 	return (
@@ -490,12 +516,22 @@ export default function game({socketId}) {
 			            isDiamondOverlay={isDiamondOverlay}
 			            diamondMoney={diamondMoney}/>
 			<div className={styles.myGameBoard}>
-				<div className={styles.gameBoard}>
-					<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]} ${my3edCards.imgName ? styles.active : ''}`}></div>
-					<div className={`${styles.card3} ${my3edCards.imgName ? pocker['bg-'+my3edCards.imgName]+' '+styles.active : ''}`}>{the3edCardDev}</div>
-					<div className={`${styles.card2} ${pocker['bg-'+myCards[1].imgName]} ${my3edCards.imgName ? styles.active : ''}`}></div>
+				<div className={`${styles.gameBoard} ${isMyCardsFlipped? styles.flipped : ''}`}>
+					<div className={`${styles.cardWrapper} ${isMyCardsFlipped? styles.flipped : ''}`}>
+						<div className={`${styles.card1} ${pocker['bg-back']}`}></div>
+						<div className={`${styles.card1} ${pocker['bg-'+myCards[0].imgName]}`}></div>
+					</div>
+					<div className={`${styles.cardWrapper} ${my3edCards.imgName? styles.flipped : ''}`} onClick={getCard}>
+						<div className={`${styles.card3} ${pocker['bg-back']}`}></div>
+						<div className={`${styles.card3} ${pocker['bg-'+my3edCards.imgName]}`}></div>
+						<img className={`${styles.clickHint} ${canShoot? styles.active : ''}`} src={"/images/tap-2.png"} />
+					</div>
+					<div className={`${styles.cardWrapper} ${isMyCardsFlipped? styles.flipped : ''}`}>
+						<div className={`${styles.card2} ${pocker['bg-back']}`}></div>
+						<div className={`${styles.card2} ${pocker['bg-'+myCards[1].imgName]}`}></div>
+					</div>
 				</div>
-				<div className={styles.bets+(myCards[0].number? " "+styles.active : "")}>
+				<div className={`${styles.bets} ${isMyCardsFlipped? styles.active : ''}`}>
 					<label className={styles.title}>下注</label>
 					<div className={styles.bigOrSmallArea+(myCards[0].number==myCards[1].number? " "+styles.active : "")}>
 						<span className={styles.inputRadio} onClick={(e) => setBigOrSmall('big')}>
@@ -562,7 +598,7 @@ export default function game({socketId}) {
 					不會射中：如果猜中賺 <img src={"/images/otherMoney.png"}/> {payShoot.no}
 				</div>
 				<div className={`${styles.closeModalHint} ${player3edCard.imgName? styles.active : ''}`}>
-					點擊空白處關閉視窗 <img src={"/images/tap.png"} />
+					點擊空白處關閉視窗 <img src={"/images/tap-1.png"} />
 				</div>
 			</div>
 		</>
