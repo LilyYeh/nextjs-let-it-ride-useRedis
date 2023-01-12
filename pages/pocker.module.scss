@@ -259,10 +259,10 @@
 }
 
 .bg-back {
-	width: 12rem;
+	width: 11.8rem;
 	height: 10.6rem;
 	background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
-	background-size: 14.8rem auto;
+	background-size: 14.6rem auto;
 	border: 0.1rem solid;
 	transform: rotateY(180deg);/*繞著Y軸旋轉*/
 }
@@ -278,19 +278,19 @@
 }
 
 @media screen and (min-width: 377px) {
-	.bg-back {
+	/*.bg-back {
 		width: 11.8rem;
 		height: 10.6rem;
 		background: url(/images/pocker.png) -0.2rem -0.2rem no-repeat;
 		background-size: 14.6rem auto;
-	}
+	}*/
 }
 
-@media screen and (max-width: 320px) {
-	.bg-back {
+@media screen and (max-width: 374px) {
+	/*.bg-back {
 		width: 7.3rem;
 		height: 10rem;
 		background: url(/images/pocker.png) -0.14rem -0.15rem no-repeat;
 		background-size: 13.8rem 12.4rem;
-	}
+	}*/
 }
