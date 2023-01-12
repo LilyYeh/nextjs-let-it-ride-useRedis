@@ -814,7 +814,7 @@ table.gameOver {
 		display: flex;
 		.card3 {
 			margin: 0 0.8rem 0 0.6rem;
-			width: 13.4rem;
+			width: 12.1rem;
 			border: 1.2px solid #000;
 			&.active {
 				margin: 0 0.9rem;
@@ -907,7 +907,7 @@ table.gameOver {
 	}
 }
 
-@media screen and (min-width: 377px) {
+@media screen and (min-width: 406px) {
 	.topColumn {
 		max-width: 376px;
 	}
