@@ -342,13 +342,14 @@ button.win {
 	min-height: calc(100vh - 9rem);
 	margin: 0 auto;
 	.gameBoard {
-		display: flex;
-		justify-content: center;
+		display: block;
+		text-align: center;
 		margin: 0 auto 2rem;
 		.cardWrapper {
-			display:inline-block;
-			margin: 0 calc((100% - 23rem)/6);
-			width: 12rem;
+			display:inline-flex;
+			align-items: end;
+			margin: 0 0.3rem;
+			width: 7.6rem;
 			height: 10.8rem;
 			position: relative;
 			transform-style: preserve-3d; /* 3D效果 */
@@ -375,8 +376,9 @@ button.win {
 			.cardWrapper {
 				&:not(.flipped) {
 					transform: rotateY(180deg); /* 繞著Y軸旋轉 */
+					width: 7.5rem;
 					height: 10.5rem;
-					margin: 0 0.35rem 0 0.5rem;
+					top: -0.1rem;
 					img.clickHint {
 						&.active {
 							visibility: visible;
@@ -811,15 +813,20 @@ table.gameOver {
 	background: url(/images/background-transparent.jpg);
 	background-size: cover;
 	.gameBoard{
-		display: flex;
+		display: block;
+		text-align: center;
+		.card1, .card2 , .card3 {
+			display: inline-block;
+			width: 7.6rem;
+		}
 		.card3 {
-			margin: 0 0.8rem 0 0.6rem;
-			width: 12.1rem;
+			margin: -0.15rem 0.5rem 0.15rem;
+			height: 10.4rem;
 			border: 1.2px solid #000;
 			&.active {
-				margin: 0 0.9rem;
-				width: 13.2rem;
 				border: none;
+				margin: 0rem 0.5rem;
+				height: 10.8rem;
 			}
 		}
 	}
@@ -912,28 +919,6 @@ table.gameOver {
 		max-width: 376px;
 	}
 
-	.myGameBoard {
-		.gameBoard {
-			/*.cardWrapper {
-				margin: 0 calc((100% - 23rem)/6);
-			}*/
-			&:not(.flipped) {
-				.cardWrapper {
-					width: 7.5rem;
-					height: 10.5rem;
-				}
-			}
-			&.flipped {
-				.cardWrapper {
-					&:not(.flipped) {
-						width: 11.4rem;
-						height: 10.5rem;
-					}
-				}
-			}
-		}
-	}
-
 	#menu {
 		.openNav {
 			top: -3.2rem;
@@ -971,22 +956,6 @@ table.gameOver {
 
 	.diamondGameBoard {
 		margin: 11rem auto 1rem;
-		.gameBoard{
-			.card1 {
-				margin-left: 1rem;
-			}
-			.card3 {
-				margin: 0 1rem 0 0;
-				width: 11.8rem;
-				//height: 10.6rem;
-				border: 1.2px solid #000;
-				background-size: 14.7rem auto;
-				&.active {
-					border: none;
-					background-size: auto auto;
-				}
-			}
-		}
 	}
 }
 
@@ -1032,31 +1001,7 @@ table.gameOver {
 			.cardWrapper {
 				margin: 0 0.2rem;
 			}
-			&:not(.flipped) {
-				.cardWrapper {
-					width: 7.2rem;
-					height: 10.5rem;
-					.card1, .card2, .card3 {
-						background-size: 13.8rem 12.4rem;
-					}
-				}
-			}
-			&.flipped {
-				.cardWrapper {
-					margin: 0;
-					width: 7.6rem;
-					&:not(.flipped) {
-						width: 7.3rem;
-						height: 10.5rem;
-						margin: 0 0.2rem 0 0.4rem;
-						.card1, .card2, .card3 {
-							background-size: 14.1rem 12.4rem;
-						}
-					}
-				}
-			}
 		}
-
 		.bets {
 			margin: 0 0.4rem 0.5rem;
 			text-align: center;
@@ -1083,26 +1028,9 @@ table.gameOver {
 
 	.diamondGameBoard {
 		margin: 9.5rem auto 1rem;
-		padding: 1rem 0rem;
 		.gameBoard{
-			.card1, .card2 {
-				margin: 0;
-				width: 10rem;
-				&.active {
-					margin: 0;
-				}
-			}
 			.card3 {
-				margin: 0 0.1rem;
-				width: 10rem;
-				height: 10.5rem;
-				background-size: 14.5rem auto;
-				&.active {
-					margin: 0;
-					width: 10rem;
-					height: auto;
-					background-size: auto;
-				}
+				margin: -0.15rem 0.1rem 0.15rem;
 			}
 		}
 	}
@@ -1132,6 +1060,46 @@ table.gameOver {
 			top: -0.3rem;
 			right: 3.5rem;
 			opacity: 0.3;
+		}
+	}
+}
+
+@media screen and (max-width: 340px) {
+	.myGameBoard {
+		.gameBoard {
+			.cardWrapper {
+				margin: 0 0.1rem;
+				width: 7.4rem;
+			}
+			&:not(.flipped) {
+				.cardWrapper {
+					width: 7.4rem;
+				}
+			}
+			&.flipped {
+				.cardWrapper {
+					&:not(.flipped) {
+						width: 7.4rem;
+					}
+				}
+			}
+		}
+	}
+	.diamondGameBoard {
+		margin: 9.5rem auto 1rem;
+		.gameBoard{
+			.card1, .card2 {
+				width: 7.5rem;
+			}
+			.card3 {
+				background-size: 13.6rem 12.2rem;
+				width: 7rem;
+				&.active {
+					background-size: unset;
+					width: 7.2rem;
+					margin: 0 0.1rem;
+				}
+			}
 		}
 	}
 }

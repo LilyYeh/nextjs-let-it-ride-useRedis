@@ -485,14 +485,6 @@ export default function game({socketId}) {
 		}
 	},[isOpenDiamondMode, diamondMoney, playersClickDiamondBets]);
 
-	/*let the3edCardDev = <>
-		<button className={'btn '+'btn-red-outline '+styles.shoot} onClick={getCard} disabled={!isMyTurn || !myCards[0].number || totalMoney <=0 || bets<=0 || !shoot}>射</button>
-		<label className={`${styles.passPay} ${isOpenDiamondMode && payPass>0? styles.active:''}`}>賠 <span className={styles.money}><img src={"/images/otherMoney.png"}/>{payPass}</span></label>
-	</>;
-	if(my3edCards.imgName) {
-		the3edCardDev = '';
-	}*/
-
 	let theDealCardDev = <>
 		<button className={'btn '+'btn-red-outline '+styles.deal} onClick={dealCards} disabled={!isMyTurn || myCards[0].number}>重新發牌</button>
 	</>
